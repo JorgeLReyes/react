@@ -1,6 +1,6 @@
 import { useState } from "react";
-export const Counter = () => {
-  const [counter, setCounter] = useState<number>(0);
+export const Counter = ({ value = 0 }: { value?: number }) => {
+  const [counter, setCounter] = useState<number>(value);
 
   // e: React.MouseEvent<HTMLButtonElement>
   const handleCounter = (number: number) =>
@@ -11,9 +11,11 @@ export const Counter = () => {
   return (
     <>
       <h1>CounterApp</h1>
-      <p>{counter}</p>
+      <h2>{counter}</h2>
       <button onClick={() => handleCounter(-1)}>-1</button>
-      <button onClick={handleReset}>0</button>
+      <button aria-label="btn-reset" onClick={handleReset}>
+        0
+      </button>
       <button onClick={() => handleCounter(+1)}>+1</button>
     </>
   );
