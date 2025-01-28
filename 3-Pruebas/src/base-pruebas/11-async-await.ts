@@ -10,7 +10,7 @@ export const getImagen = async () => {
 
     return url;
   } catch (error) {
-    console.log(error);
+    console.log({ error: (<Error>error).message });
     return "No se encontro la imagen";
   }
 };
