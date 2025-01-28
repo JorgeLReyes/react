@@ -272,3 +272,18 @@ Maneja metodos similares a render para la busqueda de elementos del dom mediante
 const heading = screen.get[All]ByRole("heading", { name: "Hola Mundo", level: 1 });
 expect(heading).toBeInTheDocument();
 ```
+
+> si dentro de un elemento le asignamos un arial-label, la propiedad name del objeto recibido en byRole buscará el nombre por este arial-label (name, id, etc no modifican el valor de name que por defecto lo toma por el texto contenido en el elemento)
+
+#### fireEvent
+
+Dispara eventos dentro del componente, se le pasa como parametro al evento elegido el elemento al que se quiere hacer click
+
+```js
+import { fireEvent, render, screen } from "@testing-library/react";
+
+test("should be click for reset, other methods", () => {
+  render(<Counter value={value} />);
+  fireEvent.click(screen.getByRole("button", { name: "btn-reset" }));
+});
+```
