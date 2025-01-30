@@ -161,6 +161,18 @@ App.defaultProps = {
 };
 ```
 
+Una forma de pasar propiedades a los hijos es de la siguiente manera
+
+```jsx
+images.map((img) => <GifItem key={img.id} title={img.title} />);
+```
+
+Pero tambien podemos pasarlas medianet destructuracion, es decir, esparcimos las "properties", todas las propiedades del img se esparcen en el contenedor hijo
+
+```jsx
+images.map((img) => <GifItem key={img.id} {...img} />);
+```
+
 ## Eventos
 
 Al pasarle el evento podemos acceder lo siguiente:
@@ -191,99 +203,85 @@ setCounter((valorActual) => valorActual + 1);
 
 Cuando cambia el estado el componente se vuelve a ejecutar pero el valor del estado se mantiene porque React lo gestiona internamente entre render
 
-## Pruebas unitarias y de integración
+## Hooks
 
-- Unitarias: enfocadas en pequeñas funcionalidades
-- Integración: enfocadas en cómo reaccionan varias piezas en conjunto
+> Los hooks no deben ser condicionales
 
-### AAA
+### useState
 
-- Arrange: establecer el estado inicial (inicializar variables, importaciones)
-- Act: Aplicamos acciones (llamar metodos o acciones)
-- Assert: observar los resultados
+Cada vez que el estado se modifica el componente se vuelve a renderizar
 
-### Paquetes
+En useState se retorna el estado y una funcion que modifica el estado, esta funcion puede recibir un parametro pero de dos maneras distintas:
 
-- Jest: Orientado para manejo a acerciones y mock
-- [(React) Testing Library](https://testing-library.com/): Orientado para manejo del DOM virtual con React
-
-### Pruebas con componentes
-
-Primero configuramenos el archivo jest.config.ts, para esto en su propiedad `testEnviroment` le daremos el siguiente valor `jest-environment-jsdom` y este paquete lo debemos de instalar (de preferencia como dependencia de desarrollo)
-
-Posteriormente si estamos trabajando con typescript debemos añadir el tipo de compilador que usará y en dado caso como debe resolver ciertos modulos
-
-```json
-{
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "esModuleInterop": true
-  }
-}
-```
-
-#### Render
-
-Ahora una vez en el test usaremos la funcion render, que es una funcion que renderiza un componente en memoria. Debemos de importarlo de testing library
+- El valor que se quiere añadir al estado
+- Una callback que recibe como funcion el estado actual y retorna el nuevo estado para ser modificado
 
 ```js
-import { render } from "@testing-library/react";
-render(Component);
+setState([...state, "Value"]);
+setState((state) => [...state, "Value"]);
 ```
 
-Cuando usamos render de React Testing Library más de una vez en la misma prueba, todos los componentes que renders inician comparten el mismo DOM virtual.
+`Batching y actualización de estado en React`
 
-Render retorna ciertas propiedades como:
+React mantiene un registro interno de los cambios a través de un sistema de colas de actualizaciones.
 
-- container: similar a un DOM, es un nodo que contiene funciones de un elemento html en js
-- getByText: obtiene un nodo por un texto, es decir el texto debe de encontrarse en un elemento dentro del componente
-- getAllByText: obtiene un arreglo de los nodos por un texto, es decir el texto debe de encontrarse en uno o varios elementos dentro del componente
-- getByTestId: buscar por dat-attribute
+1. Registro Interno (Update Queue): Cuando llamas a setState, React no actualiza el estado inmediatamente. En su lugar, guarda la actualización en una cola de actualizaciones (update queue), que es una estructura interna.
+2. Evaluación al final del ciclo:Después de que el ciclo de ejecución de la función se completa, React evalúa todas las actualizaciones en la cola. Es aquí donde se resuelven los efectos del batching: las actualizaciones se aplican todas juntas, y React calcula el estado final basado en las actualizaciones de la cola.
+3. Estado Interno:React también tiene su propio estado interno (en el "fiber", que es su unidad de trabajo), que le permite saber cuál es el estado actual de la aplicación después de aplicar todos los cambios.
 
-```js
-import { render } from "@testing-library/react";
-const {container, getByText} = render(Component);
-expect(container):toMatchSnapshot()
+- Sin función de actualización (setCategories([...state, "valor"])): React toma una "foto" del estado en el momento de la llamada. Si se llaman varias veces, puede sobrescribir el estado anterior.
+- Con función de actualización (setCategories((state) => [...state, "valor"])): React evalúa el estado actualizado en cada llamada, usando el valor más reciente durante la ejecución en el batching.
+
+Ejemplo:
+
+```jsx
+setCategories([...state, "1"]); // ["1"]
+setCategories([...state, "2"]); // ["2"]
+setCategories((state) => [...state, "3"]); // ["1", "3"]
 ```
 
-El toMatchSnapshot crea una carpeta llamada snapshot a nivel del archivo de la prueba que se ejecuta en ese momento. Lo que hace es tomar una "fotografia" del componente y compara el snapshot con lo que retorna el componente actualizado y si difiere a prueba no pasa, ayudando a que el componente no cambie de manera accidental. Para actualizarlo pulsamos la tecla "u"
+> En react 17 o inferior se hacian n renderizaciones por cada cambio de estado, en react 18 o superior no se dispara la re-renderizacion hasta que a la funcion (hilo principal) termine.
 
-#### Screen
+### useEffect
 
-React testing library tiene un objeto llamado `screen` que nos ayuda a realizar limpiezas automaticas. Screen es o son los componentes renderizados.Es una representación global del DOM virtual que se utiliza para interactuar con los elementos renderizados.
+Sirve para disparar efectos secundarios (procesos cuando algo suceda).
 
-El objeto screen actúa como una API global para consultar y depurar el contenido del DOM virtual. Por ejemplo:
+UseEffect recibe dos parametros:
 
-> Screen es la representación del DOM actual de la prueba, lo que significa que contiene todo lo que se ha renderizado durante la ejecución de la prueba en curso.
+- El efecto a disparar (callback)
+- Lista de dependencias que son las condiciones por las que se desean ejecutar el callback y es opcional
+  - Si el arreglo se deja vacio el hook solo se ejecuta al crear el componente
+  - Si se le pasa una o mas dependencias se ejecutara unicamente cuando una de estas cambie
+    > Es mala practica que useEffect sea asincrono ademas de que no puede ser asincrono ya que retorna una promesa y no una funcion como se espera.
 
-Maneja metodos similares a render para la busqueda de elementos del dom mediante las pruebas. Es decir no tiene un metodo como container pero si otros metodos que ayudan a obtener los elementos html.
+### use(CustomHook)
 
-- `screen.debug()`: mostrará el HTML combinado de los componentes como si estuvieran en el mismo documento.
+- Debe de anteponerse la palabra "use"
+- Es una funcion que retorna algo
+- Los estados del hook son independientes del componente que lo llama, pero se reinician si el componente se desmonta.
+- Cada vez que el componente se re-renderiza, el custom hook se vuelve a ejecutar, pero mantiene su estado si el componente no se desmontó.
 
-- `screen.get[All]ByRole()`: Permite buscar elementos en el DOM renderizado según su "rol", que es una categorización basada en las características de accesibilidad de los elementos HTML. Por ejemplo, los encabezados (<h1>, <h2>, etc.) tienen el rol de heading. Esto facilita encontrar elementos de manera más semántica y accesible. Además, acepta un segundo argumento, un objeto con propiedades que permiten filtrar aún más los elementos, como el texto que contienen, etiquetas aria, o niveles específicos (por ejemplo, level para headings).
+Aunque el estado dentro del custom hook está aislado, el componente que invoca al hook sí es consciente de esos cambios de estado. La re-renderización del componente ocurre porque:
 
-```js
-// Encuentra un heading de nivel 1 con texto "Hola Mundo"
-const heading = screen.get[All]ByRole("heading", { name: "Hola Mundo", level: 1 });
-expect(heading).toBeInTheDocument();
-```
+- React detecta que el valor de la propiedad que pasa el hook ha cambiado.
+- Aunque el hook gestiona su propio estado, React vuelve a renderizar el componente cuando uno de los valores que devuelve el hook cambia, ya que esos valores son ahora parte del ciclo de vida del componente. Es decir, si el hook cambia images, eso afecta al componente que usa el hook.
 
-> si dentro de un elemento le asignamos un arial-label, la propiedad name del objeto recibido en byRole buscará el nombre por este arial-label (name, id, etc no modifican el valor de name que por defecto lo toma por el texto contenido en el elemento)
+El componente que usa el hook se "suscribe" indirectamente a esos cambios, y React vuelve a renderizar el componente, porque ese valor (el que devuelve el hook) ha cambiado.
 
-#### fireEvent
+El ciclo sería algo así:
 
-Dispara eventos dentro del componente, se le pasa como parametro al evento elegido el elemento al que se quiere hacer click
+1. El componente se renderiza por primera vez.
+1. El hook se ejecuta dentro del componente, inicializando su estado (por ejemplo, con useState).
+1. Si el hook realiza una actualización de estado (como setImages), React marca el componente como "necesitando ser renderizado nuevamente" porque el valor que se devuelve del hook (como images) ha cambiado.
+1. El componente se vuelve a renderizar con los nuevos valores proporcionados por el hook.
 
-```js
-import { fireEvent, render, screen } from "@testing-library/react";
+- El custom hook gestiona su propio estado y es independiente dentro de su lógica.
+- Sin embargo, el hook devuelve el estado que luego el componente usa, lo que provoca que React detecte cambios y vuelva a renderizar el componente si es necesario.
+- Aunque el estado está aislado dentro del hook, cualquier cambio en el valor que el hook devuelve provoca la re-renderización del componente que usa ese hook.
 
-test("should be click for reset, other methods", () => {
-  render(<Counter value={value} />);
-  fireEvent.click(screen.getByRole("button", { name: "btn-reset" }));
-});
-```
+## Notas
+
+- La propiedad key es requerida por React cuando renderizas una lista de elementos repetitivos dentro de un componente, especialmente dentro de .map().
+- Las keys solo tienen que ser únicas entre hermanos, pero podemos usarlas en diferentes arrays.
+- Cuando usamos un key diferente en cada render, React considera que el componente es nuevo y no reutiliza el anterior, lo que provoca un unmount (desmontaje) y un mount (montaje) nuevamente.
+- Si actualizas el estado dentro de una promesa, React no las agrupará automáticamente, lo que provoca un re-render adicional. Sin embargo, si actualizas ambos estados dentro de la misma función asincrónica, React puede agrupar esas actualizaciones y hacer solo un render.
