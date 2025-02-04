@@ -1,4 +1,4 @@
-const key = import.meta.env.VITE_API_KEY;
+const key = "lBfPf5Ap3oLGbcUQt3LN6nUMqaVSSpK7";
 
 interface GiftsResponse {
   id: string | number;

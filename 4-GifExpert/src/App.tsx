@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { AddCategory, Category } from "./components/";
+import { AddCategory, GifGrid } from "./components/";
 
 function App() {
-  const [categories, setCategories] = useState<string[]>(["Shinobu"]);
+  const [categories, setCategories] = useState<string[]>(["Demon slayer"]);
 
   const onAddCategory = (category: string) => {
     // setCategories([...categories, "Valorant"]);
@@ -16,7 +16,7 @@ function App() {
       <h1>GifExpertApp</h1>
       <AddCategory onAddCategory={onAddCategory} />
       {categories.map((category) => (
-        <Category key={category} name={category} />
+        <GifGrid key={category} name={category} />
       ))}
     </>
   );

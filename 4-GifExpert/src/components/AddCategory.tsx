@@ -22,7 +22,7 @@ export const AddCategory = ({ onAddCategory }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} role="form">
       <input
         type="text"
         placeholder="Buscar gifs"

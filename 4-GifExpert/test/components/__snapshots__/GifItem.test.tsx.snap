@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Gif Item Component should be match to screen 1`] = `
+<div>
+  <div
+    class="card"
+  >
+    <img
+      alt="Test Gif"
+      src="https://test.com/test.gif"
+    />
+    <p>
+      Test Gif
+    </p>
+  </div>
+</div>
+`;

@@ -5,10 +5,10 @@ interface Props {
   name: string;
 }
 
-export const Category = ({ name }: Props) => {
+export const GifGrid = ({ name }: Props) => {
   const { images, isLoading } = useFetchGifs(name);
   return (
-    <section>
+    <section aria-label="container-card-grid">
       <h2>{name}</h2>
       <section className="card-grid">
         <Loader isRender={isLoading} />
