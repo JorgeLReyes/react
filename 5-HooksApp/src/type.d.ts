@@ -1,3 +1,16 @@
+export interface TodoItem {
+  id: number;
+  description: string;
+  done: boolean;
+}
+
+type actionsTodo = "ADD_TODO" | "DELETE_TODO" | "UPDATE_TODO";
+
+export interface TypeActionTodo {
+  type: actionsTodo;
+  payload: TodoItem | number;
+}
+
 export interface Pokemon {
   abilities: Ability[];
   base_experience: number;

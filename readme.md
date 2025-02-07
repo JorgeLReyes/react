@@ -574,6 +574,44 @@ El ciclo sería algo así:
 - Sin embargo, el hook devuelve el estado que luego el componente usa, lo que provoca que React detecte cambios y vuelva a renderizar el componente si es necesario.
 - Aunque el estado está aislado dentro del hook, cualquier cambio en el valor que el hook devuelve provoca la re-renderización del componente que usa ese hook.
 
+### Reducer
+
+useReducer es un hook de React que gestiona el estado mediante una función reductora, útil cuando la lógica de actualización es compleja o involucra múltiples valores.
+
+1. Es una función comun
+2. Es una función pura
+   - No debe tener efectos secundarios
+     - Debe resolver los problemas sin llamar otras funciones
+     - No deben realizar tareas asincronas
+     - No debe de llamar localStorage o sessionStora ya que son considerados efectos secundarios
+     - No debe de requerir más que una acción que puede tener un argumento
+3. Debe de retornar un nuevo estado
+4. Usualmente sólo recibe dos argumentos
+   - Valor inicial del estado
+   - Accion a ejecutar: decide como cambiará el estado
+5. Sirve para tener centralizado todas las acciones que modifican el estado
+
+```js
+const [state, dispatch] = useReducer(reducer, initialArg, init?)
+// state: estado
+// dispatch: es la funcion que se llama para disparar acciones
+
+// reducer: acciones
+// initialArg: estado inicial
+// init: function de inicialización
+```
+
+- reducer es una funcion que se encarga de actualizar el estado, pero la logica la implementamos nosotros, y la llamamos con el dispatch, el cual recibe un objeto con dos valores: type y payload
+- initialArg es el estado inicial del componente
+- init es una funcion pura, la cual se ejeucta cuando se monta el componente y retorna un estado transformado, es decir si por algun motivo el estado inicial se requiere que tenga algun formato o estructura distinta esta funcion puede realizar las modificaciones
+
+📌 Elementos principales
+
+- Estado (state) → Valor actual gestionado por el reducer.
+- Despachador (dispatch) → Función que envía acciones al reducer.
+- Reductor (reducer) → Función pura que recibe el estado actual y una acción, devolviendo un nuevo estado.
+- Acciones (action) → Objetos con una propiedad type (y opcionalmente payload) que indican cómo actualizar el estado.
+
 ## Notas
 
 - La propiedad key es requerida por React cuando renderizas una lista de elementos repetitivos dentro de un componente, especialmente dentro de .map().

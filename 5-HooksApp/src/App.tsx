@@ -1,4 +1,4 @@
-import { Padre } from "./07-tarea-memo/Padre";
+import TodoApp from "./08-useReducer/Todo";
 
 function App() {
   return (
@@ -14,7 +14,8 @@ function App() {
       {/* <Memorize /> */}
       {/* <MemoHook /> */}
       {/* <CallbackHook /> */}
-      <Padre />
+      {/* <Padre /> */}
+      <TodoApp />
     </>
   );
 }
