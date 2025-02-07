@@ -8,3 +8,14 @@ button {
 .bg {
   background-color: #96cbff;
 }
+
+.my-page {
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #aaa;
+}
+
+.dark {
+  /* filter: invert(1); */
+  background-color: light-dark(#efedea, #414141);
+}

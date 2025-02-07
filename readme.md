@@ -574,7 +574,7 @@ El ciclo sería algo así:
 - Sin embargo, el hook devuelve el estado que luego el componente usa, lo que provoca que React detecte cambios y vuelva a renderizar el componente si es necesario.
 - Aunque el estado está aislado dentro del hook, cualquier cambio en el valor que el hook devuelve provoca la re-renderización del componente que usa ese hook.
 
-### Reducer
+### useReducer
 
 useReducer es un hook de React que gestiona el estado mediante una función reductora, útil cuando la lógica de actualización es compleja o involucra múltiples valores.
 
@@ -611,6 +611,212 @@ const [state, dispatch] = useReducer(reducer, initialArg, init?)
 - Despachador (dispatch) → Función que envía acciones al reducer.
 - Reductor (reducer) → Función pura que recibe el estado actual y una acción, devolviendo un nuevo estado.
 - Acciones (action) → Objetos con una propiedad type (y opcionalmente payload) que indican cómo actualizar el estado.
+
+### Context, createContext y useContext
+
+El context (contexto) es un es un high order component, es un contenedor de información que le permite a los componentes hijos de el leer y ejecutar metodos y estados dentro del context.
+
+```js
+import { createContext } from "react";
+// Pide un argumento que es el estado inicial y es el valor que se expondrá a los hijos
+createContext(initialState?);
+```
+
+> Los high order component a parte de tener propiedades "normales", tienen una propiedad especial que se llama children que tecnicamente es o son los componentes o elementos jsx/tsx que recibe entre la apertura y cierre de su etiqueta
+
+Para usar el proveedor, usamos el contexto que se nos retorne y usamos la propiedad provider como un componente. Lo siguiente indica que queremos proveer toda la informacion tiene hacia el arbol de los componentes que son el children por medio de la propiedad value, que este nombre es un nombre obligatorio, es decir, tal cual tiene que llamarse la propiedad
+
+```js
+export const UserContext= createContext(initialState?);
+// value es el valor que queremos compartir
+const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  return <UserContext.Provider value={...args}>{children}</UserContext.Provider>;
+};
+```
+
+Debemos usarlo un componente arriba de donde deseamos usarlo, es decir, debemos encapsular en este componente que retorne al componente desde lo empezaremos a usar. Con esto nuevamente, cualquier elemento o componente y subcomponentes tendran acceso al provider
+
+> Si envolvemos un componente dentro de un provider pero no usamos la propiedad children, cualquier elemento dentro de este provider no se renderizará
+
+`useContext`
+
+Este hook nos permitirá tener acceso al objeto del contexto antes definido.
+
+```tsx
+import { useContext } from "react";
+import { UserContext } from "./context/UserContext";
+
+// function Component...
+useContext(Context);
+```
+
+- Para que react sepa que contexto utilizar debemos de pasarle el contexto previamente creado
+- Si hay mas de un contexto con el mismo nombre el useContext retornará el context mas cerca que se encuentre del nodo por encima de este
+- El context nos devolvera el value mas actual que contiene el provider
+
+#### Mas sobre el Context
+
+- El contexto tiene 2 objetos: un proveedor (wrapper -> todos los valores) y un consumer (consumir los valores)
+
+- En un mismo archivo no se puede usar el provider y a su vez el useContext porque marcaría un error ya que al definir context antes este no obtendrá los valores del proveedor si no los valores iniciales.
+
+```js
+// Function Component
+//❌ Esto daria error
+const context = useContext(Context)
+
+<Context.Provider>
+  // {children}
+</Context.Provider>
+```
+
+Esto sucede porque useContext obtiene el contexto en el momento en que se ejecuta el componente, y si el Provider aún no ha sido establecido, no puede acceder a los valores actualizados y obtendrás los valores predeterminados del contexto en lugar de los valores proporcionados por el Provider.
+
+`Creando un contexto`
+
+- Para crear un contexto usaremos la funcion `createContext` que se importa de la libreria react
+- El contexto tiene dos objectos:
+  - Un proveedor o wrapper que provee a los elementos internos que tenga todos los valores globales
+  - Un consumer que permite consumir los valores que provee el proveedor a los hijos
+
+```ts
+import { createContext } from "react";
+
+const ThemeContext = createContext();
+// ThemeContext.Provider
+// ThemeContext.Consumer
+```
+
+`Creando un proveedor`
+
+Crearemos un proveedor que envolvera a los componentes y los recibirá como propiedad en la propiedad children, es obligatorio que haga uno de esta propiedad ya que si no los compontenes hijos no se re-renderizaran y por ende no se vera usado el context
+
+En el siguiente ejemplo crearemos un componente que debe retornar un jsx con el provider que nos da el context
+
+- Para compartir los valores debemos hacer uso de la propiedad value que se encuentra dentro del provider, esta tiene que llamarse tal cual y puede compartir cualquier tipo de valor.
+
+- El componente creado funciona como cualquier otro componente con la unica diferencia que retorna un provider, es decir dentro de este podemos usar cualquier hook.
+
+```jsx
+const ThemeContext = createContext();
+
+const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  return <ThemeContext.Provider value={{}}>{children}</ThemeContext.Provider>;
+};
+```
+
+El siguiente es un ejemplo de como quedaria un provider que maneja temas
+
+```jsx
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const [theme, setTheme] = useState("light");
+
+  const handleTheme = (e: ChangeEvent<HTMLInputElement>) =>
+    setTheme(e.target.value);
+
+  const data = { theme, handleTheme };
+
+  return <ThemeContext.Provider value={data}>{children}</ThemeContext.Provider>;
+};
+```
+
+- Como vemos los datos que va a compartir son el estado y una función modifica dicha variable
+
+`Usando Provider o el provider`
+
+Antes de empezar a usar el contexto necesitamos mandar a llamar el proveedor, ya que sin este, si se compartira el estado o valores, pero solamente las que se definieron al crear el `createContext` y solamente con el valor que se les asigno al inicio
+
+Es importante mencionar que necesitamos usar el proveedor un nivel arriba del o los componentes que deseamos que sean proveidos por los valores
+
+```jsx
+// Function Componente....{
+return (
+  <div className="my-page">
+    <ThemeProvider>
+      <Header theme={theme} texts={texts} />
+      <Main theme={theme} texts={texts} auth={auth} />
+      <Footer theme={theme} texts={texts} />
+    </ThemeProvider>
+  </div>
+);
+```
+
+`Usando el consumer dentro del provider`
+
+Es importante destacar que no podremos usar el useContext o el consumer en el mismo componente donde importemos el proveedor. Es decir si se puede siempre y cuando el useContext o consumer este dentro del provider, pero no al mismo nivel. Tambien cabe destacar que podemos usar el consumer dentro de cualquier componente que se encuentre dentro del proveedor
+
+```jsx
+ return (
+    <div className="my-page">
+      <ThemeProvider>
+        // No se puede usar fuera del provider
+        <ThemeContext.Consumer>
+          {(context) => (
+            <>
+              <Header theme={context.theme!} handleTheme={context.handleTheme!}/>
+              <Main theme={context.theme!} texts={texts} auth={auth} />
+              <Footer theme={context.theme!} texts={texts} />
+            </>
+          )}
+        </ThemeContext.Consumer>
+      </ThemeProvider>
+    </div>
+  );
+```
+
+`Usando el consumer useContext`
+
+Cuando usamos useContext ya no es necesario pasar las props de padre a hijo o componentes mas internos, si no que, al compartir valores podemos hacer uso de este hook indicandole el contexto del cual queremos tomar los valores.
+
+El componente del proveedor podria quedar de la siguiente forma
+
+```jsx
+return (
+  <div className="my-page">
+    <ThemeProvider>
+      <Header
+        auth={auth}
+        language={language}
+        texts={texts}
+        handleLanguage={handleLanguage}
+        handleAuth={handleAuth}
+      />
+      <Main texts={texts} auth={auth} />
+      <Footer texts={texts} />
+    </ThemeProvider>
+  </div>
+);
+```
+
+Como ya no se pasan por propiedades a los componentes hijos ahora los componetes hijos deben extraer las propiedades del contexto.
+
+El useContext recibe un parametro que es el contexto creado (no el provider, no el consumer), es decir el que se creó con createContext, y retorna los valores que retorna el proveedor
+
+```jsx
+const contextValues = useContext(Context);
+```
+
+Un ejemplo siguiendo el contexto que hemos creado sería el siguiente
+
+```jsx
+const Main = ({ texts, auth }: { texts: Translations, auth: boolean }) => {
+  const { theme } = useContext(ThemeContext);
+
+  return (
+    <main className={theme}>
+      {auth ? <p>{texts.mainHello}</p> : <p>{texts.mainWelcome}</p>}
+      <h2>{texts.mainContent}</h2>
+    </main>
+  );
+};
+```
+
+`Pasos`
+
+1. Creamos el context con createContext y lo exportamos
+2. Creamos un componente que sea el proveedor, que retorne el proveedor del context junto con sus hijos(children) y values(valores)
+3. Llamamos al compontente proveedor en el componente que englobará el contexto
+4. Usamos el consumer o useContext en cada hijo que necesite el contexto
 
 ## Notas
 

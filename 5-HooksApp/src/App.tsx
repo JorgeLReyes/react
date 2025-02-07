@@ -1,4 +1,4 @@
-import TodoApp from "./08-useReducer/Todo";
+import MyPage from "./09-useContext/useContext/MyPage";
 
 function App() {
   return (
@@ -15,7 +15,11 @@ function App() {
       {/* <MemoHook /> */}
       {/* <CallbackHook /> */}
       {/* <Padre /> */}
-      <TodoApp />
+      {/* <TodoApp /> */}
+      {/* <BrowserRouter>
+        <Main />
+      </BrowserRouter> */}
+      <MyPage />
     </>
   );
 }
