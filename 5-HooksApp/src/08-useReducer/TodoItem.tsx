@@ -11,9 +11,16 @@ const TodoItemList = ({
 }) => {
   return (
     <li className="list-group-item d-flex justify-content-between">
-      <span className={`${todo.done ? "text-decoration-line-through":""} "align-self-center"`} style={{cursor:"default"}} onClick={() => {
-            handleUpdateTodo(todo.id);
-          }}>
+      <span
+        className={`${
+          todo.done ? "text-decoration-line-through" : ""
+        } align-self-center`}
+        style={{ cursor: "default" }}
+        onClick={() => {
+          handleUpdateTodo(todo.id);
+        }}
+        aria-label="span"
+      >
         {todo.done ? "✅" : "❌"}
         {todo.description}
       </span>

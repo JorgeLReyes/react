@@ -2,7 +2,6 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { Pokemon } from "../type";
 
 const PokemonCard = ({ id, name, sprites }: Pokemon) => {
-  console.log("object");
   const h2Ref = useRef<HTMLHeadingElement>(null);
   const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
 
@@ -14,9 +13,13 @@ const PokemonCard = ({ id, name, sprites }: Pokemon) => {
 
   return (
     <>
-      <section style={{ height: 200, display: "flex", flexDirection: "row" }}>
+      <section
+        style={{ height: 200, display: "flex", flexDirection: "row" }}
+        aria-label="pokemon"
+        role="group"
+      >
         <h2 ref={h2Ref} className="text-capitalize">
-          #{id} - {name}
+          # {id} - {name}
         </h2>
         <div>
           <img src={sprites.front_default} alt={name} />

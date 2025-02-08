@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import Footer from "./Footer";
 import Main from "./Main";
 import Header from "./Header";
@@ -46,7 +46,7 @@ const translations: { [key: string]: Translations } = {
   },
 };
 
-const MyPage = () => {
+const MyPage = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState(initialLanguage);
   const [texts, setTexts] = useState<Translations>(translations[language]);
   const [auth, setAuth] = useState(false);
@@ -60,6 +60,7 @@ const MyPage = () => {
 
   return (
     <div className="my-page">
+      {children}
       <ThemeProvider>
         <Header
           auth={auth}

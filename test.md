@@ -16,6 +16,8 @@
 
 ### Pruebas con componentes
 
+> npm i jest @types/jest jest-environment-jsdom @testing-library/react ts-jest -D
+
 Primero configuramenos el archivo jest.config.ts, para esto en su propiedad `testEnviroment` le daremos el siguiente valor `jest-environment-jsdom` y este paquete lo debemos de instalar (de preferencia como dependencia de desarrollo)
 
 Posteriormente si estamos trabajando con typescript debemos añadir el tipo de compilador que usará y en dado caso como debe resolver ciertos modulos
@@ -136,18 +138,118 @@ El result tiene o retorna un objeto con una propiedad llamada current en donde v
 
 3. result.current se actualiza automáticamente con el nuevo estado del hook, sin que tú tengas que hacer una reasignación manual.
 
-Existe una funcion llamada `waitFor` (espera por) que es una promesa y recibe un callback que debe retornar un valor booleano y como segundo valor recibe un objeto que puede recibir una propiedad llamada timeout que indica el tiempo que tiene para que la condicion de la funcion de callback se cumpla
+📌`waitFor`
 
-`waitFor` es una función de React Testing Library que espera de manera asíncrona hasta que una condición se cumpla.
+La función `waitFor` es una **promesa** que recibe un **callback** y espera hasta que la condición definida en él se cumpla. También acepta un segundo argumento opcional, un **objeto de configuración**, que puede incluir la propiedad `timeout`, la cual define el tiempo máximo de espera antes de que la prueba falle.
 
-- `waitFor` ejecuta la función de callback varias veces hasta que la condición se cumpla o el tiempo de espera expire.
-- Si el texto no está disponible de inmediato, sigue intentando hasta que lo encuentre.
-- Si después de un tiempo el elemento aún no aparece, la prueba falla.
+> Existe una funcion llamada `waitFor` (espera por) que es una promesa y recibe un callback que debe retornar un valor booleano y como segundo valor recibe un objeto que puede recibir una propiedad llamada timeout que indica el tiempo que tiene para que la condicion de la funcion de callback se cumpla
+
+- ¿Cómo funciona `waitFor`?
+  - `waitFor` ejecuta repetidamente la función de callback hasta que la condición se cumpla o el tiempo de espera expire.
+  - Si el elemento o valor esperado no está disponible de inmediato, `waitFor` sigue intentando hasta encontrarlo.
+  - Si después del tiempo especificado la condición no se cumple, la prueba fallará.
+
+El siguiente código prueba la actualización del estado de un contador, esperando que su valor aumente tras llamar a `increment`. Sin embargo, hay un detalle importante:
+
+```js
+test("El contador debe aumentar en 1 - waitFor", async () => {
+  const { result } = renderHook(() => useCounter(100));
+  const { counter, increment } = result.current;
+
+  increment(); // Se llama a la función para incrementar el contador
+
+  await waitFor(() => {
+    expect(counter).toBe(101); // Esperamos que el contador haya cambiado
+  });
+});
+```
+
+🔍 Peculiaridad en este código
+
+El valor de counter fue extraído en el momento en que se ejecutó renderHook. Dado que los valores primitivos en JavaScript son inmutables y no reaccionan a cambios en el estado, counter dentro del waitFor sigue siendo el mismo valor inicial. Sin embargo, en algunos casos el valor podría cambiar, pero esto no es seguro y depende de cómo Jest maneje la ejecución de las pruebas.
+
+- Ese valor de counter es un primitivo y no se actualizará aunque el estado del hook cambie.
+- Sin embargo, en la prueba con waitFor, el callback se ejecuta varias veces hasta que la condición se cumpla. Dependiendo de cómo Jest maneja el ciclo de ejecución, podría darse el caso en el que counter se actualice accidentalmente si en ese momento se está reevaluando result.current, pero esto no es fiable.
+- Por eso lo correcto es hacer la aserción sobre result.current.counter, ya que este siempre reflejará el estado más reciente.
+
+A pesar de que increment() actualiza el estado del hook, la variable counter dentro del expect no se actualizará automáticamente. En su lugar, deberíamos referenciar result.current.counter, que siempre reflejará el estado más reciente:
+
+```js
+test("El contador debe aumentar en 1 - waitFor (corregido)", async () => {
+  const { result } = renderHook(() => useCounter(100));
+  const { increment } = result.current;
+
+  act(() => {
+    increment();
+  });
+
+  await waitFor(() => {
+    expect(result.current.counter).toBe(101); // Ahora se accede al valor actualizado
+  });
+});
+```
+
+📌`act`
+
+> Act espera a que react actualice y re-renderice el estado para continuar con las pruebas
+
+- act es una función de React Testing Library que asegura que todas las actualizaciones de estado y efectos se completen antes de que realices las aserciones.
+- Sincrónicamente garantiza que todas las actualizaciones de estado y el renderizado de React se hayan completado antes de continuar. Esto es cierto tanto para las actualizaciones de estado sincrónicas como asincrónicas.
+- Cuando se envuelven operaciones asincrónicas dentro de act, como promesas o setTimeout, act espera hasta que la operación asincrónica haya terminado y React haya procesado el cambio de estado, actualizando el componente.
+- Por tanto, act asegura que el estado se haya actualizado y que el renderizado de React se haya completado antes de proceder con las aserciones, sin necesidad de esperar explícitamente con waitFor.
+
+🛑 `<valorExtraido de result.current>` es una variable primitiva o no primitiva, pero el hook siempre se encargará de devolver tanto objetos como valores "nuevos".
+A lo que se quiere llegar es que regularmente en un hook siempre se retornara un objeto u array los cuales apuntan a referencia y esta referencia siempre cambiará al ser retornados.
+Result es un objeto que jamás cambiará jamas cambia su referencia y aunque se pudiera pensar que current tampoco, es todo lo contrario ya que como el es el que recibe el valor del hook, lo mas seguro es que el hook retorne un nuevo objeto, por lo cual current nunca tendrá la misma referencia.
+
+```js
+test("counter debe aumentar en 1 - act", () => {
+  const { result } = renderHook(() => useCounter(100));
+  const { increment } = result.current;
+  act(() => {
+    increment();
+    increment(2);
+  });
+  expect(result.current.counter).toBe(103);
+});
+```
+
+🥊`waitFor vs act`
+
+| **Función** | **¿Qué hace?**                                                                                                                                                                                                      | **¿Cuándo usarla?**                                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `act`       | Agrupa actualizaciones de estado y asegura que React procese los cambios antes de continuar con la prueba. Se usa tanto para actualizaciones síncronas como asíncronas, pero **no espera** que una promesa termine. | Cuando necesitas que React re-renderice el componente antes de hacer aserciones. En actualizaciones asíncronas, se combina con `waitFor` si es necesario. |
+| `waitFor`   | Reintenta ejecutar un callback varias veces hasta que la condición se cumpla o se agote el tiempo de espera.                                                                                                        | Cuando esperas que el estado o el DOM se actualicen de forma asíncrona y necesitas asegurarte de que el cambio haya ocurrido.                             |
+
+#### Probar con un context
+
+Cuando usamos un componente con useContext debemos indicarle de donde obtendrá su contexto porque para el test no existe, asi que usaremos el provider del context y le pasaremos los valores que deseamos que el compontente hijo tenga
+
+```js
+test("debe mostrar el componente sin el usuario", () => {
+  render(
+    <UserContext.Provider
+      value={{
+        user: {
+          name: "jorge",
+          email: "jorge@gmail.com",
+          id: 1,
+        },
+      }}
+    >
+      <HomePage />
+    </UserContext.Provider>
+  );
+  screen.debug();
+});
+```
 
 #### Metodos de jest
 
+- toContain: Se usa para verificar si un valor específico (por ejemplo, un número, una cadena, o un objeto) está presente dentro de un arreglo o iterable. Para objetos, comparará las referencias de memoria, no el contenido
 - toContainEqual: se espera que en una lista de elementos el valor proporcionado en esta funcion se encuentre en esta lista, En los objetos compara los valores de forma profunda, es decir, compara las propiedades de los objetos, no las referencias.
-- toContain:Compara el valor exactamente (por referencia en objetos o por valor en primitivos).
+- toEqual: compara el contenido de los objetos de forma recursiva. Esto significa que verifica si los valores y propiedades de los objetos son iguales, aunque no sean exactamente el mismo objeto en memoria.
+- toStrictEqual: verifica la estructura interna de los objetos y asegura que las propiedades de los objetos sean del tipo correcto (en lugar de solo comparar el valor).
 
 #### Mocks jest
 
@@ -203,6 +305,12 @@ export const GifGrid = () => <div>GifGrid</div>;
 jest.mock("../src/components/GifGrid", () => ({
   GifGrid: jest.fn().mockReturnValue(<div>Mocked GifGrid</div>),
 }));
+```
+
+#### Router
+
+```js
+import { MemoryRouter } from "react-router-dom";
 ```
 
 #### Resolucion a problemas con importaciones css

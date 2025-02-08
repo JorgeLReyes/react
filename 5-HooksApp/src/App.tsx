@@ -19,7 +19,9 @@ function App() {
       {/* <BrowserRouter>
         <Main />
       </BrowserRouter> */}
-      <MyPage />
+      <MyPage>
+        <h1>Mi page context</h1>
+      </MyPage>
     </>
   );
 }

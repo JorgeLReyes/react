@@ -7,7 +7,7 @@ const LoginPage = () => {
   return (
     <>
       <h2>LoginPage</h2>
-      <p>{JSON.stringify(user)}</p>
+      <p aria-label="user">{JSON.stringify(user)}</p>
       <button
         onClick={() => setUser?.({ name: "John Doe", id: 123, email: "jorge" })}
       >
