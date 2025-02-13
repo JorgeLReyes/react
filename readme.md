@@ -424,13 +424,12 @@ const Small = memo(({ value }: { value: number }) => {
   console.log("Small renderizado");
 
   return <small>{value}</small>;
-};)
+});
 
 export default Small;
-
 ```
 
-`memo` es una funcion que memoriza el componente que recibe como argumento y solo cambiará cuando las propieades cambian (y estados)
+React.memo() memoriza el componente y solo lo vuelve a renderizar cuando las props cambian, basándose en una comparación superficial de las props. Si las props no cambian (es decir, tienen la misma referencia), React evita el renderizado del componente.
 
 - `useMemo`
 
