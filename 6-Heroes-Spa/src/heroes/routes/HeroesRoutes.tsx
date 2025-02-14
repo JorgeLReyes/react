@@ -11,7 +11,6 @@ const HeroesRoutes = () => {
           <Route path="dc" element={<DCPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="hero/:id" element={<HeroPage />} />
-          {/* <Route path="hero/:heroId" element={} /> */}
           <Route index element={<Navigate to="/heroes/marvel" />} />
         </Routes>
       </div>

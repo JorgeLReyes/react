@@ -1,9 +1,15 @@
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const LoginPage = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const onLogin = () => navigate({ pathname: "/heroes" }, { replace: true });
+  const onLogin = () => {
+    const lastPath = localStorage.getItem("lastPath") || "/heroes";
+    login("Ingrid");
+    navigate(lastPath, { replace: true });
+  };
 
   return (
     <div className="container mt-5">

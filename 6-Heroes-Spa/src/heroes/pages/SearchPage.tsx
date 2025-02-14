@@ -16,7 +16,7 @@ const SearchPage = () => {
     const value = inputRef.current!.value.trim();
     // if (!value) return;
     // navigate({ search: `q=${value}` });
-    setParams({ q: value });
+    if (query !== value) setParams({ q: value });
   };
 
   return (

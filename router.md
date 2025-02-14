@@ -216,3 +216,107 @@ const [searchParams, setSearchParams] = useSearchParams();
   | ------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
   | encodeURI | Solo caracteres especiales (excepto /, ?, &, =) | Tienes una URL completa y quieres evitar que se rompa. |
   | encodeURIComponent | Todos los caracteres especiales | Quieres codificar solo valores dentro de una URL (ej. query params). |
+
+## Rutas protegidas
+
+Debemos usar el <Route> como high order component, que es un <Route> que recibe otras rutas <Route> como hijas
+
+```jsx
+<Routes>
+  <Route path="invoices" element={<Invoices/>}>
+    <Route path=":invoiceId" element={<Invoice/>}/>
+    <Route path="sent" element={<SendInvoices/>}/>
+  <Route>
+</Route>
+```
+
+### Outlet Component
+
+Es el que haria la representacion de las rutas que recibe un Route y que se usará dentro del componente que se renderiza con el path del <Route> padre
+
+```jsx
+<Routes>
+  <Route path="invoices" element={<Invoices/>}>
+    <Route path=":invoiceId" element={<Invoice/>}/> // Parte del outlet
+    <Route path="sent" element={<SendInvoices/>}/> // Parte del outlet
+  <Route>
+</Route>
+
+```
+
+Y el componente se veria asi
+
+```jsx
+function Invoices() {
+  return (
+    <div>
+      <h1>Invoices</h1>
+      <Outlet />
+    </div>
+  );
+}
+```
+
+Aunque podriamos hacerlo de la siguiente manera.
+
+Hacemos que la ruta que queremos hacer privada sea renderizada condicionalmente dentro de un componente que es el que dará o no acceso a que se renderize el componente que contiene la ruta protegida
+
+```jsx
+
+// Ruta publica
+<Route path="/heroes/*" element={<HeroesRoutes />} />
+
+// Ruta privada con el componente protegido
+<Route path="/heroes/*" element={<PrivateRoute><HeroesRoutes /></PrivateRoute>}/>
+```
+
+Y asi quedaria el componente privado.
+
+```jsx
+const PrivateRoute = ({ children }: { children: ReactNode }) => {
+  const logged = true;
+  return logged ? children : <Navigate to="/login" />;
+};
+```
+
+> Cuando HeroesRoutes se renderiza dentro de PrivateRoute, React Router detecta que es un componente que contiene más <Route> y vuelve a evaluar sus rutas internas.
+
+`Con outlet` quedaria de la siguiente manera:
+
+```jsx
+<Route path="/heroes/*" element={<HeroesRoutes />}>
+  <Route path="marvel" element={<MarvelPage />} />
+  <Route path="dc" element={<DCPage />} />
+  <Route path="search" element={<SearchPage />} />
+  <Route path="hero/:id" element={<HeroPage />} />
+  {/* <Route path="hero/:heroId" element={} /> */}
+  <Route index element={<Navigate to="/heroes/marvel" />} />
+</Route>
+```
+
+```jsx
+const HeroesRoutes = () => {
+  return (
+    <>
+      <Navbar />
+      <div className="container">
+        <Outlet />
+      </div>
+    </>
+  );
+};
+```
+
+> No se pede poner un <Route> como hijo directo de un Componente. Un <Route> solo puede ser usado como un hijo de un elemento <Routes>, nunca se debe renderizar de manera directa.
+
+```js
+<Route
+  path="/login"
+  element={
+    <PublicRoute>
+      // ❌ Debe estar entre un Routes
+      <Route path="/" element={<Login />} />
+    </PublicRoute>
+  }
+/>
+```
