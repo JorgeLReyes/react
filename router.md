@@ -320,3 +320,462 @@ const HeroesRoutes = () => {
   }
 />
 ```
+
+## createBrowserRouter
+
+Primero empezaremos importando `createBrowserRouter` y `RouterProvider`
+
+- `createBrowserRouter` es una funcion que recibe como argumento un array de objetos de rutas, con dos principales propiedades: path y element
+
+```js
+import { createBrowserRouter } from "react-router-dom";
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div>Hello world!</div>,
+  },
+]);
+```
+
+Ahora necesitaremos en este caso un provider, que es practicamente como el BrowserRouter pero este componente proveedor recibe como propiedad un router que es el que creamos con `createBrowserRouter`
+
+```js
+import { RouterProvider } from "react-router-dom";
+
+export const MainRouter = () => {
+  return <RouterProvider router={router} />;
+};
+```
+
+### createRoutesFromElements
+
+Configurar rutas con JSX. Puedes hacerlo con createRoutesFromElements. No hay ninguna diferencia funcional entre JSX u objetos al configurar tus rutas, es simplemente una preferencia de estilo.
+
+```jsx
+import {
+  createRoutesFromElements,
+  createBrowserRouter,
+  Route,
+} from "react-router-dom";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route
+      path="/"
+      element={<Root />}
+      loader={rootLoader}
+      action={rootAction}
+      errorElement={<ErrorPage />}
+    >
+      <Route errorElement={<ErrorPage />}>
+        <Route index element={<Index />} />
+        <Route
+          path="contacts/:contactId"
+          element={<Contact />}
+          loader={contactLoader}
+          action={contactAction}
+        />
+        <Route
+          path="contacts/:contactId/edit"
+          element={<EditContact />}
+          loader={contactLoader}
+          action={editAction}
+        />
+        <Route path="contacts/:contactId/destroy" action={destroyAction} />
+      </Route>
+    </Route>
+  )
+);
+```
+
+### Componente de página de error
+
+Dentro del objeto de alguna ruta podemos usar una propiedad llamada errorElement que renderiza un elemento jsx o componente en caso de que la url padre o hijas de algun error
+
+```jsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div>Hello world!</div>,
+    errorElement: <ErrorPage />,
+  },
+]);
+```
+
+#### useRouteElement
+
+Es un custom hook de react dom que permite capturar el error en caso de que la pagina o url cause un error, como por ejempo, que el path no se encuentre
+
+- Si un errorElement está definido en una ruta, captura errores SOLO de esa ruta y sus hijos.
+- Si una ruta no tiene errorElement, el de su padre más cercano lo maneja.
+- Si el error ocurre en un loader o action, también se captura en errorElement.
+
+```jsx
+import { useRouteError } from "react-router-dom";
+
+const ErrorPage = () => {
+  const error = useRouteError() as { statusText: string };
+  // ...
+  }
+```
+
+#### Error contextual
+
+Ocurre cuando una ruta válida genera un error en su loader, action o en el propio componente. Se maneja con errorElement.
+
+```jsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+        loader: async () => {
+          throw new Error("Falló la carga de datos");
+        },
+        errorElement: <DashboardError />, // Captura errores solo en esta ruta
+      },
+    ],
+  },
+  { path: "*", element: <NotFound /> }, // Maneja URLs inexistentes
+]);
+```
+
+- 📌 Si alguien entra a /random, verá NotFound porque esa ruta no existe.
+- 📌 Si /dashboard tiene un fallo en su loader, solo se verá DashboardError, sin afectar toda la app.
+
+### Rutas anidadas
+
+Si queremos que una ruta este a nivel de la raiz de otra ruta simplemente creamos un nuevo objeto a ese nivel, pero si queremos que empiecen a compartir componentes como ciertos layouts debemos de empezarlos a envolver en un mismo nivel.
+
+Aqui es donde usaremos la propiedad children
+
+```js
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div>Hello world!</div>,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "login",
+        element: <Contact />,
+      },
+    ],
+  },
+]);
+```
+
+#### Index route o ruta de indice
+
+Es una ruta hija que en vez de tener un path tiene una propieadad llamada index en true y se renderiza cuando la ruta padre se renderice, es decir, si estamos en el root se renderizará en el root, si entra como hija de otra ruta, se renderizará cuando su padre se renderice.
+
+- Si el padre es "/" el index es "/" y se renderizará cuando la ruta sea exactamente la del padre
+- Si el padre es "/ruta" el index es "/ruta" y se renderizará cuando la ruta sea exactamente la del padre
+- Si el padre es "/ruta" el index es "/ruta", pero si la url en ese momento es "/ruta/rutaHija", entonces no se renderizará.
+
+El index: true permite que una ruta tenga un contenido por defecto sin interferir con las rutas hijas.
+
+Sin un índice, si visitas la ruta padre, no se renderizaría nada dentro del <Outlet /> hasta que accedas a una subruta específica.
+
+Con index: true, puedes definir qué se muestra por defecto en la ruta padre sin afectar el comportamiento de las demás rutas hijas.
+
+### loader y useLoaderData
+
+La propiedad loader recibe como valor una funcion que puede o no ser asrincrona y que el valor que retorna devuelve al componente de la ruta que se va a renderizar. Esta funcion se ejecutará antes de que el componente se renderize.
+
+```js
+import Root, { loader as rootLoader } from "./routes/root";
+
+export async function loader() {
+  const contacts = await getContacts();
+  return { contacts };
+}
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    loader: rootLoader,
+    children: [
+      {
+        path: "contacts",
+        element: <Contact />,
+      },
+    ],
+  },
+]);
+```
+
+`useLoaderData` es un custom hook que permitirá obtener los valores que fueron proporcionados por el retorno de la funcion de loader.
+
+```js
+import { Outlet, Link, useLoaderData } from "react-router-dom";
+
+export default function Root() {
+  const { contacts } = useLoaderData();
+}
+```
+
+### Segmentos o parámetros en la URL
+
+Para hacer un ruta que recuba un parámetro dinámico usaremos `:`. Los dos puntos tienen un significado especial, ya que lo convierten en un "segmento dinámico". Los segmentos dinámicos coincidirán con los valores dinámicos (cambiantes) en esa posición de la URL. A estos valores de la URL los llamamos "Parámetros de URL" o, simplemente, "parámetros".
+
+Si el componente que se renderizará con la ruta dinamica es hijo de otro y solo queremos que a la ruta padre se le añada este segmento dinamico, en el path del componente que recibe la url dinamica podemos unicamente poder `:<param>`
+
+En el siguiente ejempo a la ruta dinamica le anteponemos otra ruta, entonces se navegaria hacia `/heroes/hero/:id` pero si omitimos "hero" podemos dejar unicamente `:id` y navegariamos hacia `/heroes/:id`
+
+```jsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "heroes",
+        element: (
+          <PrivateRoute>
+            <HeroesRoutes />
+          </PrivateRoute>
+        ),
+        children: [
+          {
+            path: "hero/:id",
+            element: <HeroPage />,
+          },
+        ],
+      },
+    ],
+  },
+]);
+```
+
+##### Params con loader
+
+Los params `(:param)` se pasan al loader con claves que coinciden con el segmento dinámico. Por ejemplo, nuestro segmento tiene un nombre, :contactId por lo que el valor se pasará como params.contactId.
+
+```jsx
+import { Form, useLoaderData } from "react-router-dom";
+import { getContact } from "../contacts";
+
+export async function loader({ params }) {
+  const contact = await getContact(params.contactId);
+  return { contact };
+}
+
+// Component
+export default function Contact() {
+  const { contact } = useLoaderData();
+  // existing code
+}
+```
+
+```jsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    loader: rootLoader,
+    action: rootAction,
+    children: [
+      {
+        path: "contacts/:contactId",
+        element: <Contact />,
+        loader: contactLoader,
+      },
+    ],
+  },
+]);
+```
+
+### Actions
+
+Las acciones (action) en React Router permiten manejar la lógica de una solicitud HTTP que es enviada desde un formulario, como si fuera una función de tipo "submit", pero sin necesidad de recargar la página. Son útiles para manejar peticiones asíncronas, procesamiento de datos y redirección dentro de tu aplicación.
+
+Una acción es una función que se ejecuta cuando se hace una solicitud POST desde un formulario, similar al comportamiento de un manejador tradicional de formularios. Su propósito es manejar la lógica detrás de los datos enviados en un formulario, ya sea para procesarlos, validarlos, o realizar otras operaciones como redirigir al usuario.
+
+Para usar una acción en React Router, debes asociar la ruta con una función action. Esta función manejará las solicitudes HTTP que lleguen a la ruta, normalmente asociadas a un formulario que realiza una petición POST.
+
+Cuando un formulario <Form> lanza un submit con el metodo post, la accion definida en esa ruta la capturará (si el formulario tiene definido una ruta en la accion, la accion de esa ruta la captuará, tenga en cuenta que el path es relativo a la ruta que nos encontramos si no se antepone un /). Uns vez recibida la funcion cuenta con dos parámetros:
+
+- request: tiene una propiedad llamada formData, que es una funcion que retorna la data del formulario
+- params: captura los segmetos dinámicos de la ruta como propieades
+
+```jsx
+export async function contactAction({ request, params }) {
+  const formData = await request.formData();
+  const updates = Object.fromEntries(formData);
+  await updateContact(params.contactId, updates);
+  return redirect(`/contacts/${params.contactId}`);
+}
+```
+
+> redirect es una funcion de react-router que redirige a la ruta correspondiente
+
+#### Usando el componente <Form> con action
+
+El componente <Form> de React Router se puede utilizar tanto con la propiedad action (como un formulario tradicional HTML) como sin ella, utilizando la función action asociada a la ruta.
+
+1. Cuando no defines action en el <Form>:
+
+- Si no defines la propiedad action, React Router usará la función action asociada a la ruta correspondiente para manejar la solicitud POST.
+- Si no hay función action asociada, el formulario se comportará como un formulario HTML tradicional, haciendo una solicitud al action especificado o a la URL de la ruta.
+
+```jsx
+<Form method="post">
+  <input type="text" name="name" />
+  <button type="submit">Submit</button>
+</Form>
+```
+
+2. Cuando defines action en el <Form>:
+
+- Si defines la propiedad action en el formulario, se enviará la solicitud POST a la URL especificada en action.
+- Si hay una función action en esa ruta, React Router interceptará la solicitud y la manejará de manera asincrónica.
+
+```jsx
+<Form method="post" action="/submit">
+  <input type="text" name="name" />
+  <button type="submit">Submit</button>
+</Form>
+```
+
+Para definir un action en las rutas lo hacemos de la siguiente manera:
+
+```jsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    loader: rootLoader,
+    action: rootAction,
+    children: [
+      {
+        path: "contacts/:contactId",
+        element: <Contact />,
+        action: contactAction,
+        loader: contactLoader,
+      },
+    ],
+  },
+]);
+```
+
+#### Comportamiento de useActionData() en React Router
+
+Cuando se usa useActionData() con Form en React Router, hay un comportamiento importante a tener en cuenta: React Router siempre limpia useActionData() al iniciar una nueva navegación con Form. Esto sucede para evitar que los datos de una acción previa persistan incorrectamente en una nueva solicitud.
+
+`¿Cómo funciona?`
+
+1. Al enviar el formulario con Form, useActionData() se reinicia a undefined inmediatamente.
+1. Luego, cuando la action del formulario se ejecuta y retorna datos, el componente se renderiza nuevamente con los nuevos datos.
+
+`¿Por qué ocurre este comportamiento?`
+
+- Garantiza que useActionData() solo contenga datos de la acción más reciente.
+- Evita estados obsoletos al cambiar de navegación.
+- Mantiene consistencia en la UI, asegurando que el usuario solo vea los datos correctos en cada nueva búsqueda o acción.
+
+Este comportamiento es automático y no requiere configuración adicional. Si se necesita persistencia de datos entre navegaciones, se debe manejar con un estado global o en la URL (useSearchParams).
+
+#### Capturando valores de retorno de action
+
+Si decidimos que la funcion action no hará una redirección podemos hacer un return de los valores y en el componente usaremos useActionData() que retornará la data del action
+
+### UseNavigation
+
+useNavigation es un custom hook que permite saber como se encuentra la carga de contenido de elemento que renderiza la url, este maneja 3 estados que son:
+
+- "idle"
+- "submitting"
+- "loading".
+
+### useSubmit
+
+```jsx
+const submit = useSubmit();
+
+<Form id="search-form" role="search">
+  <input
+    id="q"
+    aria-label="Search contacts"
+    placeholder="Search"
+    type="search"
+    name="q"
+    defaultValue={q}
+    onChange={(event) => {
+      submit(event.currentTarget.form, {
+        replace: !isFirstSearch,
+      });
+    }}
+  />
+  {/* existing code */}
+</Form>;
+```
+
+Con submi, mientras escribe, el formulario se envía automáticamente.
+En el argumento estamos pasando event.currentTarget.form. El currentTargetes el nodo DOM al que está asociado el evento y el currentTarget.formes el nodo de formulario principal de la entrada. La submitfunción serializará y enviará cualquier formulario que le pase.
+
+- submit recibe como segundo argumento un objeto con una propiedad replace, que reemplaza los resultados de la búsqueda, ya que con cada envio se crea una nueva entrada en el hitorial
+
+### useFetcher
+
+useFetcher es un hook de React Router v6.4+ que te permite interactuar con rutas de forma asincrónica y cargar datos sin necesidad de navegar o cambiar la URL. Es útil para obtener datos o realizar acciones (como enviar formularios) sin hacer una redirección o recargar la página. Funciona como un "fetcher" de datos, manejando la carga de información y el estado de la solicitud.
+
+Características clave:
+
+- Carga de datos sin cambiar la URL: Puedes hacer peticiones HTTP (usualmente con GET, POST, etc.) sin cambiar la URL de la página.
+- load(): Usado para hacer solicitudes a una URL y obtener datos.
+- state: Puedes manejar el estado de la solicitud, como si está cargando, si hubo un error, o si la solicitud fue exitosa.
+- Ideal para formularios y peticiones asíncronas: Se usa comúnmente para enviar datos a un servidor sin cambiar la URL o navegar a otra página.
+
+```js
+import { useFetcher } from "react-router-dom";
+
+const MyComponent = () => {
+  const fetcher = useFetcher();
+
+  const handleLoadData = () => {
+    fetcher.load("/api/data");
+  };
+
+  return (
+    <div>
+      <button onClick={handleLoadData}>Load Data</button>
+      {fetcher.state === "loading" && <p>Loading...</p>}
+      {fetcher.data && <p>{fetcher.data}</p>}
+    </div>
+  );
+};
+```
+
+- useFetcher te permite cargar y manejar datos sin redirigir o cambiar la URL.
+- Ideal para obtener datos de forma asíncrona, como peticiones a APIs o enviar formularios.
+
+### Otros componentes de router dom
+
+#### Form
+
+El Form nos permite usar un formulario de manera muy similar a el formulario de HTML pero con la diferencia que no recarga la página al ser enviado, es decir, podemos dispensar de hacer un metodo que capture el evento. Ademas este <Form> es que este usa los actions por defecto
+
+En un <Form>, los nombres de los inputs (name="q") actúan directamente como los parámetros en la URL.
+
+```jsx
+<Form method="get">
+  <input type="text" name="q" />
+  <button>Search</button>
+</Form>
+
+// Output
+// /ruta-actual?q=valor
+```

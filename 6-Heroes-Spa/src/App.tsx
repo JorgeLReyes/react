@@ -1,12 +1,12 @@
-import { AuthProvider } from "./auth/context/AuthContext";
-import AppRouter from "./router/AppRouter";
+import { Outlet } from "react-router-dom";
+// import { AuthProvider } from "./auth/context/AuthContext";
+// import AppRouter from "./router/AppRouter";
 
 const App = () => {
   return (
     <>
-      <AuthProvider>
-        <AppRouter />
-      </AuthProvider>
+      {/* <AppRouter /> */}
+      <Outlet />
     </>
   );
 };
