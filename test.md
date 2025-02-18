@@ -385,7 +385,7 @@ El MemoryRouter se importa de react-router-dom y permite tener ciertas caracteri
 ##### Routes explicito e implicito
 
 1. Sin Routes ni Route:
-   En React Router v6, cuando usas MemoryRouter con initialEntries, como en el ejemplo:
+   En React Router v6, cuando usas MemoryRouter con initialEntries, React Router maneja la ruta automáticamente y renderiza el componente correspondiente basado en la URL proporcionada en initialEntries, sin necesidad de definir explícitamente las rutas.
 
 ```jsx
 <MemoryRouter initialEntries={["/login"]}>
@@ -393,10 +393,12 @@ El MemoryRouter se importa de react-router-dom y permite tener ciertas caracteri
 </MemoryRouter>
 ```
 
-React Router automáticamente hace coincidir la ruta (/login) y renderiza el componente correspondiente (PublicRoute) basado en esa URL.
+React Router automáticamente hace coincidir la ruta (/login) con el componente (PublicRoute), sin la necesidad de especificar rutas explícitas mediante Routes o Route.
+
+Esta forma es útil para pruebas simples cuando solo tienes una ruta que necesitas simular o cuando no tienes un conjunto complejo de rutas que gestionar.
 
 2. Con Routes y Route:
-   Si deseas definir explícitamente las rutas y los componentes asociados, usas Routes y Route, como en:
+   Si tienes múltiples rutas y necesitas un control más detallado sobre qué componente se renderiza para cada ruta, debes usar Routes y Route. Aquí defines explícitamente las rutas y los componentes que se deben renderizar para cada una.
 
 ```jsx
 <MemoryRouter initialEntries={["/login"]}>
@@ -406,8 +408,6 @@ React Router automáticamente hace coincidir la ruta (/login) y renderiza el com
   </Routes>
 </MemoryRouter>
 ```
-
-Esto es necesario cuando tienes múltiples rutas y quieres especificar qué componente debe renderizarse para cada ruta.
 
 - Sin Routes y Route: React Router maneja la ruta automáticamente si se pasa a initialEntries.
 - Con Routes y Route: Debes definir explícitamente las rutas y los componentes asociados.
