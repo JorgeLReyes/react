@@ -307,6 +307,31 @@ jest.mock("../src/components/GifGrid", () => ({
 }));
 ```
 
+##### Mocks a hooks
+
+Para poder mockear un hook, debemos hacer un mook parcial ya que comunmente los hooks viene en un paquete con mas hooks. En este caso veremos como mockear un hook de react-router-dom
+
+Para ello haremos un mook sobre la libreria de react-router-dom, para ello el primer parámetro le pasaremos el path o nombre de la libreria.
+
+Como segundo parámetro jest.mock recibe un callback, que en este caso, retorna para este caso un objeto que seran los modulos o hooks. Asi que si queremos mockear un hook debemos de llamar la propiedad tal cual se llama el hook, pero si solo le pasamos el nombre del hook que queremos usar, todos los demas hooks "ya no existen", por lo cual al usarlo en otros test no encontrarian el hook.
+
+> La función dentro de jest.mock se ejecuta en el momento en que se evalúa el módulo, es decir, antes de que los tests comiencen a ejecutarse.
+
+Para que esos hooks se mantengan con su implementacion usaremos jest.requeriActual, que es una funcion que indica que usa lo que exporta la libreria que se le pase como argumento y eso mismo es lo que retorna en forma de objeto que es como comunmente hacen los modulos, es decir, obtiene el módulo original para no perder funciones
+
+```jsx
+jest.mock("react-router-dom", () => ({
+  // exparse todo lo que viene en la libreria
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
+}));
+```
+
+Si no establecieramos el `useNavigate` para ser mockeado desde el principio Jest ya ha reemplazado el módulo entero cuando se mockea.
+Por lo tanto, si no se define `useNavigate` en el mock desde el inicio, no se puede mockear después porque el módulo ya fue sobrescrito y, no necesitas mockear la implementación real ya que esta se mantiene disponible y puedes usarla sin problemas.
+
+> Si haces un jest.mock de un paquete y dejas que requireActual pase todas las implementaciones reales, no podrás mockear una función específica de ese módulo después.
+
 #### Router
 
 ```js
@@ -347,3 +372,44 @@ import styles from "./styles.css";
 }
 
 ```
+
+### Pruebas con router
+
+#### MemoryRouter
+
+El MemoryRouter se importa de react-router-dom y permite tener ciertas caracteriticas que el mismo BrowserRouter(v6).
+
+- MemoryRouter es un tipo de router en React Router que mantiene la navegación en memoria en lugar de usar la URL del navegador.
+- Tiene una propiedad llamada initialEntries que recibe un arreglo de rutas que son las rutas que estaran disponibles para esa prueba
+
+##### Routes explicito e implicito
+
+1. Sin Routes ni Route:
+   En React Router v6, cuando usas MemoryRouter con initialEntries, como en el ejemplo:
+
+```jsx
+<MemoryRouter initialEntries={["/login"]}>
+  <PublicRoute>{children}</PublicRoute>
+</MemoryRouter>
+```
+
+React Router automáticamente hace coincidir la ruta (/login) y renderiza el componente correspondiente (PublicRoute) basado en esa URL.
+
+2. Con Routes y Route:
+   Si deseas definir explícitamente las rutas y los componentes asociados, usas Routes y Route, como en:
+
+```jsx
+<MemoryRouter initialEntries={["/login"]}>
+  <Routes>
+    <Route path="login" element={<PublicRoute>{children}</PublicRoute>} />
+    <Route path="heroes" element={<h1>Marvel route</h1>} />
+  </Routes>
+</MemoryRouter>
+```
+
+Esto es necesario cuando tienes múltiples rutas y quieres especificar qué componente debe renderizarse para cada ruta.
+
+- Sin Routes y Route: React Router maneja la ruta automáticamente si se pasa a initialEntries.
+- Con Routes y Route: Debes definir explícitamente las rutas y los componentes asociados.
+
+> Para evaluar el localstorage usamos el objeto Storage.prototype y mockeamos con jest la funcion que necesiamos estar espiando (Storage.prototype.setItem = jest.fn())
