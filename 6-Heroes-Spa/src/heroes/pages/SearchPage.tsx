@@ -1,18 +1,19 @@
 import { useRef } from "react";
 import HeroCard from "../components/HeroCard";
-import { Form, useActionData, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { getHeroByName } from "../helpers/getHeroByName";
 
 const SearchPage = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [params, setParams] = useSearchParams();
   const query = params.get("q") || "";
-  const data = useActionData() as { q: string };
-  const heroes =
-    query || !data
-      ? getHeroByName(query)
-      : getHeroByName((data as { q: string })["q"]);
-  console.log("render", data);
+  // const data = useActionData() as { q: string };
+  // const heroes =
+  //   query || !data
+  //     \? getHeroByName(query)
+  //     : getHeroByName((data as { q: string })["q"]);
+  const heroes = getHeroByName(query);
+
   // const location = useLocation();
   // const { q = "" } = queryString.parse(location.search) as { q: string };
   const onSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,7 +30,7 @@ const SearchPage = () => {
         <div className="col-5">
           <h4>Searching</h4>
           <hr />
-          <form onSubmit={onSearchSubmit}>
+          <form onSubmit={onSearchSubmit} role="form">
             <input
               ref={inputRef}
               type="text"
@@ -41,7 +42,7 @@ const SearchPage = () => {
             />
             <button className="btn btn-outline-primary">Search</button>
           </form>
-          <Form method="post">
+          {/* <Form method="post">
             <input
               type="text"
               placeholder="Search a hero with Form (react-dom)"
@@ -51,16 +52,20 @@ const SearchPage = () => {
               defaultValue={query}
             />
             <button className="btn btn-outline-primary">Search</button>
-          </Form>
+          </Form> */}
         </div>
         <div className="col-7">
           <h4>Results</h4>
           <hr />
 
-          {!query && <div className="alert alert-primary">Search a hero</div>}
+          {!query && (
+            <div className="alert alert-primary" aria-label="search">
+              Search a hero
+            </div>
+          )}
 
           {query && !heroes.length && (
-            <div className="alert alert-danger">
+            <div className="alert alert-danger" aria-label="error">
               No hero finding: <b>{query}</b>
             </div>
           )}

@@ -76,7 +76,7 @@ const router = createBrowserRouter([
             element: <HeroPage />,
           },
           {
-            path: "",
+            index: true,
             element: <Navigate to="/heroes/marvel" />,
           },
         ],

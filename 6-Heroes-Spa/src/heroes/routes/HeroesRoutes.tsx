@@ -5,8 +5,8 @@ const HeroesRoutes = () => {
   return (
     <>
       <Navbar />
-      <Outlet />
-      {/* <div className="container">
+      {/* <Outlet /> */}
+      <div className="container">
         <Routes>
           <Route path="marvel" element={<MarvelPage />} />
           <Route path="dc" element={<DCPage />} />
@@ -14,7 +14,7 @@ const HeroesRoutes = () => {
           <Route path="hero/:id" element={<HeroPage />} />
           <Route index element={<Navigate to="/heroes/marvel" />} />
         </Routes>
-      </div> */}
+      </div>
     </>
   );
 };

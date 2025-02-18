@@ -11,6 +11,7 @@ export interface AuthContextConsumer {
 export const enum AuthTypes {
   LOGIN = "LOGIN",
   LOGOUT = "LOGOUT",
+  DEFAULT = "DEFAULT",
 }
 
 export interface AuthAction {
