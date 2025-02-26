@@ -5,6 +5,7 @@ import { ImageGallery } from "../components/";
 const NoteView = () => {
   return (
     <Grid2
+      className="animate__animated animate__fadeIn animate__faster"
       container
       direction={"row"}
       justifyContent={"space-between"}

@@ -12,7 +12,10 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { useStore } from "../../hook";
 const Sidebar = ({ drawerWidth }: { drawerWidth: number }) => {
+  const { useAppSelector } = useStore();
+  const displayName = useAppSelector((state) => state.auth.displayName);
   return (
     <Box
       component="nav"
@@ -33,7 +36,7 @@ const Sidebar = ({ drawerWidth }: { drawerWidth: number }) => {
       >
         <Toolbar>
           <Typography variant="h6" noWrap component={"div"}>
-            Jorge
+            {displayName}
           </Typography>
         </Toolbar>
         <Divider />
