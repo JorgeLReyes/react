@@ -101,9 +101,7 @@ export const registerUserWithEmailPassword = async ({
 
 export const logoutFirebase = async () => {
   try {
-    const res = await signOut(FirebaseAuth);
-    console.log(res);
-    return res;
+    return await signOut(FirebaseAuth);
   } catch (error) {
     console.log(error);
   }

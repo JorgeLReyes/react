@@ -1,21 +1,12 @@
-import { TurnedInNot } from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  Drawer,
-  Grid2,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, Drawer, List, Toolbar, Typography } from "@mui/material";
 import { useStore } from "../../hook";
+import { SidedbarItem } from "./SidedbarItem";
 const Sidebar = ({ drawerWidth }: { drawerWidth: number }) => {
   const { useAppSelector } = useStore();
-  const displayName = useAppSelector((state) => state.auth.displayName);
+  const { displayName, notes } = useAppSelector((state) => ({
+    displayName: state.auth.displayName,
+    notes: state.journal.notes,
+  }));
   return (
     <Box
       component="nav"
@@ -41,27 +32,8 @@ const Sidebar = ({ drawerWidth }: { drawerWidth: number }) => {
         </Toolbar>
         <Divider />
         <List>
-          {[
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-          ].map((text) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <TurnedInNot />
-                </ListItemIcon>
-                <Grid2 container>
-                  <ListItemText primary={text} />
-                  <ListItemText secondary={"lorem lore lorem lorem"} />
-                </Grid2>
-              </ListItemButton>
-            </ListItem>
+          {notes.map((note) => (
+            <SidedbarItem key={note.id} note={note} />
           ))}
         </List>
       </Drawer>

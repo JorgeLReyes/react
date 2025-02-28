@@ -13,6 +13,10 @@ export const useForm = <T>(
     if (validation) createValidators();
   }, [form]);
 
+  useEffect(() => {
+    setForm(initialForm);
+  }, [initialForm]);
+
   const onInputChange = ({
     target: { name, value },
   }: React.ChangeEvent<HTMLInputElement>) => {

@@ -4,6 +4,7 @@ import {
   signInWithGoogle,
   logoutFirebase,
 } from "../../firebase/providers";
+import { clearNotesLogout } from "../journal";
 import { type AppDispatch } from "../store";
 import { checkingCredentials, login, logout } from "./auth";
 
@@ -87,6 +88,7 @@ export const startCreatingUserWithEmailPassword = ({
 export const startLogout = () => {
   return async (dispatch: AppDispatch) => {
     await logoutFirebase();
+    dispatch(clearNotesLogout());
     dispatch(
       logout({
         message: "Sesión finalizada",

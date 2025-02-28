@@ -318,6 +318,22 @@ Sin el tipado generico ts nos dará un error ya que espera que la funcion que le
 
 4. Uso de dispatch dentro del thunk: Dentro del thunk, puedes usar el dispatch que se pasó como argumento para despachar otras acciones, como por ejemplo, dispatch(startLoadingPokemons()).
 
+### Segundo argumento de la funcion que retorna
+
+```js
+export const startNewNote = () => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    const newNote = {
+      title: "",
+      body: "",
+      date: new Date().getTime(),
+    };
+  };
+};
+```
+
+Cuando usamos dispatch y queremos usar thunks, la funcion que retorna recibe como parametro el getState, que es una funcion que retorna el estado global de la aplicacion
+
 ## RTK Query Overview
 
 Si bien Redux Toolkit se usa comúnmente para manejar el estado de la aplicación, RTK Query se enfoca principalmente en simplificar las solicitudes de datos y la gestión de caché.

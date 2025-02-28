@@ -163,3 +163,94 @@ useEffect(() => {
 1. onAuthStateChanged escucha cambios en el estado del usuario autenticado.
 1. Devuelve una función (unsubscribe) que, al ejecutarse, detiene la suscripción.
 1. El return en useEffect ejecuta esa función cuando el componente se desmonta, evitando fugas de memoria.
+
+#### Singout
+
+Permite cerrar la sesion del usuario desde donde esta conectado
+
+```js
+return await signOut(FirebaseAuth);
+
+return await FirebaseAuth.signOut();
+```
+
+### Crear base de datos
+
+1. Ir a firestore database
+2. Click en crear base de datos
+3. Usar modo produccion
+4. Seleccionar región
+
+#### Insertar
+
+`doc() y collection() en Firestore`
+
+Las funciones doc() y collection() en Firebase Firestore devuelven referencias dependiendo de lo que reciben como argumento.
+
+- doc() crea una referencia a un documento si recibe una colección o una ruta válida.
+- collection() crea una referencia a una colección, ya sea a partir de db o un documento.
+- Ambas funciones generan referencias, pero lo que devuelven depende del contexto en el que se usen.
+
+📌 Cómo actúa doc()
+
+1. Si recibe db y un path a un documento, devuelve una referencia a ese documento
+
+   - Si el documento no existe, Firestore lo creará cuando se le agreguen datos.
+
+2. Si recibe una referencia a una colección y un ID, devuelve una referencia a un documento dentro de esa colección:
+
+```js
+const docRef = doc(FirebaseBD, "users/user123");
+// o
+const notesCollection = collection(FirebaseBD, `users`);
+const newDoc = doc(notesCollection, "id-personalizado");
+
+// idpersonalizado es opcional, el id solo es recibido si el path no acaba en documento o si directamente es una coleccion
+```
+
+📌 Cómo actúa collection()
+
+1. Si recibe db y un path a una colección, devuelve una referencia a esa colección
+2. Si recibe una referencia a un documento y un nombre de colección, devuelve una subcolección dentro de ese documento:
+
+```js
+const usersCollection = collection(FirebaseBD, "users");
+// o
+const userDoc = doc(FirebaseBD, "users/user123");
+const postsCollection = collection(userDoc, "posts");
+```
+
+- doc() crea una referencia a un documento, ya sea existente o nuevo.
+- setDoc() usa esa referencia para crear o actualizar el documento.
+- addDoc() crea un documento dentro de una colección y genera un ID automáticamente.
+
+Si quieres controlar el ID, usas doc() + setDoc().
+
+Si quieres que Firestore genere el ID, usas addDoc().
+
+- setDoc: Si el documento ya existe, lo sobrescribe completamente.
+- addDoc: Siempre crea un nuevo documento con un ID generado automáticamente, por lo que nunca chocará con un documento existente.
+
+> if request.auth != null; regla para que solo usuarios estan autenticados
+
+#### Obtener
+
+Para obtener los documentos de una coleccion usaremos getDocs que recibe como argmento una coleccion
+
+```javascript
+import { collection, getDocs } from "firebase/firestore/lite";
+
+const collectionRef = collection(FirebaseBD, `${uuid}/journal/notes`);
+const docs = await getDocs(collectionRef);
+```
+
+Nos devolvera un array de objetos con cierta información pero dentro de cada objeto hay una propiedad en el prototype llamada data la cual nos retornará la data del documento
+
+#### Eliminar
+
+Para eliminar un documento de una coleccion usaremos deleteDoc que recibe como argmento un documento y retorna un void si todo sale bien o un error si no lo elimina
+
+```javascript
+    const docRef = doc(FirebaseBD, `${uuid}/journald/note/${note!.id}`);
+   await deleteDoc(docRef);
+```

@@ -17,6 +17,12 @@ import {
   startGoogleSignIn,
   startLoginWithEmailPassword,
 } from "../../store/auth/thunks";
+
+const initialState = {
+  email: "",
+  password: "",
+};
+
 export const LoginPage = () => {
   const { useAppSelector } = useStore();
   const { status, errorMessage } = useAppSelector((state) => ({
@@ -28,10 +34,7 @@ export const LoginPage = () => {
   const { form, onInputChange } = useForm<{
     email: string;
     password: string;
-  }>({
-    email: "",
-    password: "",
-  });
+  }>(initialState);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

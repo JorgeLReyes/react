@@ -4,10 +4,12 @@ import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { login, logout } from "../store/auth/auth";
 import { FirebaseAuth } from "../firebase/init";
+import { startLoadingNotes } from "../store/journal";
+import { AppDispatch } from "../store/store";
 
 export const useCheckAuth = () => {
   const { useAppSelector } = useStore();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const status = useAppSelector((state) => state.auth.status);
 
   useEffect(() => {
@@ -22,6 +24,8 @@ export const useCheckAuth = () => {
           uuid: uid,
         })
       );
+
+      dispatch(startLoadingNotes());
     });
   }, [dispatch]);
 
