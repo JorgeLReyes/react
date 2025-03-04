@@ -197,7 +197,7 @@ Las funciones doc() y collection() en Firebase Firestore devuelven referencias d
 
    - Si el documento no existe, Firestore lo creará cuando se le agreguen datos.
 
-2. Si recibe una referencia a una colección y un ID, devuelve una referencia a un documento dentro de esa colección:
+2. Si recibe una referencia a una colección y un ID, devuelve una referencia o id a un documento dentro de esa colección, si no existe lo crea al momento de guardarlo.
 
 ```js
 const docRef = doc(FirebaseBD, "users/user123");

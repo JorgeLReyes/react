@@ -1,6 +1,6 @@
-import { collection, getDocs } from "firebase/firestore/lite";
-import { FirebaseBD } from "../src/firebase/init";
-import { note } from "../src/store/journal";
+import { collection, getDocs } from "firebase/firestore";
+import { FirebaseBD } from "../firebase/init";
+import { note } from "../store/journal";
 
 export const loadNotes = async (uuid: string) => {
   if (!uuid) throw new Error("Uuid no existe");

@@ -72,3 +72,5 @@ CssBaseline en Material UI es un componente que normaliza y resetea los estilos 
 - Paleta de colores: Defines los colores principales, secundarios y de fondo. Estos colores se aplicarán automáticamente a los componentes como los botones, fondos, etc.
 - Tipografía: Estableces la fuente base de la aplicación y también puedes definir tamaños y estilos de texto para encabezados (h1, h2, etc.), párrafos, etc.
 - Otros ajustes globales: Como márgenes, rellenos, y otros estilos de los componentes, aunque estos se manejan de manera más específica en los componentes.
+
+> Ver slotProps de materialUi

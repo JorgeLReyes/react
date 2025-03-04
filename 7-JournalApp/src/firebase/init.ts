@@ -1,15 +1,19 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore/lite";
+import { getFirestore } from "firebase/firestore";
+import { getEnviroments } from "../helpers";
 // Your web app's Firebase configuration
+
+const env = getEnviroments();
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCCchrMhTSKanKZDdZsgb17whV30opi1cg",
-  authDomain: "react-cursos-a3ca7.firebaseapp.com",
-  projectId: "react-cursos-a3ca7",
-  storageBucket: "react-cursos-a3ca7.firebasestorage.app",
-  messagingSenderId: "655339010286",
-  appId: "1:655339010286:web:0a201b383e78c9b8871bff",
+  apiKey: env.VITE_APIKEY,
+  authDomain: env.VITE_AUTHDOMAIN,
+  projectId: env.VITE_PROJECTID,
+  storageBucket: env.VITE_STORAGEBUCKET,
+  messagingSenderId: env.VITE_MESSAGINGSENDERID,
+  appId: env.VITE_APPID,
 };
 
 // Initialize Firebase

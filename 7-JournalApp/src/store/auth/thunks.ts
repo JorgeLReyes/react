@@ -14,14 +14,9 @@ export const checkingAuthentication = () => {
   };
 };
 
-export const startLoginWithEmailPassword = ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  return async (dispatch: AppDispatch) => {
+export const startLoginWithEmailPassword =
+  ({ email, password }: { email: string; password: string }) =>
+  async (dispatch: AppDispatch) => {
     dispatch(checkingCredentials());
     const result = await loginWithEmailPassword({ email, password });
     if (!result.ok) return dispatch(logout({ message: result.errorMessage! }));
@@ -34,7 +29,6 @@ export const startLoginWithEmailPassword = ({
       })
     );
   };
-};
 
 export const startGoogleSignIn = () => {
   return async (dispatch: AppDispatch) => {

@@ -413,3 +413,98 @@ Esta forma es útil para pruebas simples cuando solo tienes una ruta que necesit
 - Con Routes y Route: Debes definir explícitamente las rutas y los componentes asociados.
 
 > Para evaluar el localstorage usamos el objeto Storage.prototype y mockeamos con jest la funcion que necesiamos estar espiando (Storage.prototype.setItem = jest.fn())
+
+### Pruebas con redux
+
+Para evaluar los slices del store o reducers podemos retonar el mismo slice que nos regresará el objeto que hemos construido. Es decir, podemos obtener propiedades como actions, reducer, name, etc.
+
+` Evaluar el estado`
+
+Podemos evaluar el estado de dos formas, con la funcion getInicialState que nos retorna el estado desde el store
+
+```js
+expect(authSlice.getInitialState()).toEqual(initialState);
+```
+
+O simular el estado con la funcion `slice.reducer` que nos da el mismo slice, que es la función que maneja las actualizaciones del estado en tu Redux slice. Es responsable de procesar las acciones y actualizar el estado en función del type de la acción.
+
+Esta se usa principalmente para testear o simular cómo se comporta un reducer con un estado dado y una acción específica, sin interactuar directamente con la store de Redux.
+
+> Llamar a slice.reducer no afecta la store global de Redux, solo calcula un nuevo estado basándose en la acción. Para modificar el estado global debes usar dispatch.
+
+El slice.reducer en Redux recibe dos parámetros:
+
+- state: El estado actual que se está gestionando. Si es la primera vez que se ejecuta el reducer, este será el estado inicial que hayas definido. En otros casos, será el estado que haya sido actualizado por acciones anteriores.
+- action: Un objeto que generalmente tiene al menos dos propiedades:
+
+```js
+const state = authSlice.reducer(initialState, {
+  type: "",
+}); // el objeto mandado es una accion
+expect(state).toEqual(initialState);
+```
+
+#### Thunks
+
+Para probar un thunks podemos hacer un mock de un dispatch y llamaos al action creators para saber como fue llamado ese dispatch
+
+```js
+const dispacth = jest.fn();
+checkingAuthentication()(dispacth as AppDispatch);
+expect(dispacth).toHaveBeenCalledWith(checkingCredentials());
+expect(dispacth).toHaveBeenCalledWith({ type: "auth/checkingCredentials" });
+```
+
+> Si estamos con firebase lo mejor es trabajar con el modulo de "firebase/firestore sin la version lite"
+
+> MockResolveValue para promesas
+> MockReturnValue para funciones normales
+
+### Variables de entorno
+
+Actualmente no se puede usar el paquete import.meta.env\[var]
+
+Por lo cual una forma ideal seria definiendo una funcion que retorne las variables de entorno pero a su vez desde el test pueda ser mockeada.
+
+Primero definimos la funcion:
+
+```js
+export const getEnviroments = () => {
+  const ENVS = import.meta.env;
+
+  return { ...ENVS };
+};
+```
+
+Es importante destacar que no hacemos el spread del `import.meta.env` en el return ya que puede ser que retorne un objeto vacio. Podría haber un problema porque import.meta.env no siempre está disponible en tiempo de ejecución en todos los entornos.
+
+Ahora usaremos el archivo jest.setup.ts que es un archivo que se ejecuta antes de iniciar todos los test, esto gracias a que lo difnimos en la propiedad `setupFiles` del config de jest. Esto lo que hace es ejecutar todo lo que hay y usarlo en cada prueba si es necesario
+
+Posterior a eso usaremos un paquete llamado `dotenv`
+
+```js
+import { config } from "dotenv";
+import { jest } from "@jest/globals";
+
+config({
+  path: ".env.test",
+});
+
+jest.mock("./src/helpers/getEnviroments", () => ({
+  getEnviroments: () => ({ ...process.env }),
+}));
+```
+
+Aqui configuraremos el archivo, si es que querermos usar las varibales de test, si no, podemos omitir dicha configuracion.
+
+Posteriormente ahora si realizamos el mock y aqui es donde, como jest corre mediante node, podemos usar process y asi obtener las variables de entorno
+
+#### PreloadState
+
+En tests con Redux, preloadedState es útil para establecer un estado inicial específico y evitar dependencias en el estado por defecto de los reducers.
+
+`¿Cuándo usarlo?`
+
+- Para simular estados específicos, como un usuario autenticado o no autenticado.
+- Para evitar la influencia del estado inicial del reducer en las pruebas.
+- Para testear componentes con un estado predefinido sin necesidad de ejecutar acciones previas.

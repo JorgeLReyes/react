@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, setDoc } from "firebase/firestore/lite";
+import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { AppDispatch, RootState } from "../store";
 import { FirebaseBD } from "../../firebase/init";
 import {
@@ -12,10 +12,9 @@ import {
   setSaving,
   updateNote,
 } from "./journal";
-import { loadNotes } from "../../../helpers/loadNotes";
-import { fileUpload } from "../../../helpers/fileUpload";
+import { fileUpload, loadNotes } from "../../helpers/";
 
-export const startNewNote = () => {
+export const startNewNote = (firebaseBD: typeof FirebaseBD = FirebaseBD) => {
   return async (dispatch: AppDispatch, getState: () => RootState) => {
     const { uuid } = getState().auth;
     // const uuid = FirebaseAuth.currentUser?.uid;
@@ -27,9 +26,9 @@ export const startNewNote = () => {
       date: new Date().getTime(),
     };
 
-    const newDoc = doc(collection(FirebaseBD, `${uuid}/journal/notes`));
+    const newDoc = doc(collection(firebaseBD, `${uuid}/journal/notes`));
     await setDoc(newDoc, newNote);
-
+    // setDoc(newDoc, newNote);
     newNote.id = newDoc.id;
 
     dispatch(addNewEmptyNote(newNote));

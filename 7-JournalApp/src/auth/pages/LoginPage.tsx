@@ -38,6 +38,7 @@ export const LoginPage = () => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(form);
     dispacth(startLoginWithEmailPassword(form));
   };
 
@@ -48,6 +49,7 @@ export const LoginPage = () => {
   return (
     <AuthLayout title="Login">
       <form
+        role="form"
         onSubmit={onSubmit}
         className="animate__animated animate__fadeIn animate__faster"
       >
@@ -65,6 +67,11 @@ export const LoginPage = () => {
           </Grid2>
           <Grid2 size={{ xs: 12 }} sx={{ mt: 2 }}>
             <TextField
+              slotProps={{
+                input: {
+                  inputProps: { "data-testid": "password" },
+                },
+              }}
               label="Contraseña"
               type="password"
               name="password"
@@ -96,6 +103,7 @@ export const LoginPage = () => {
 
             <Grid2 size={{ xs: 12, sm: 6 }}>
               <Button
+                aria-label="google-sign-in"
                 variant="contained"
                 fullWidth
                 onClick={onGoogleSignIn}
