@@ -130,18 +130,18 @@ export type AppDispatch = typeof store.dispatch;
 ```js
 export type RootState = ReturnType<typeof store.getState>;
 
-// <typeof store.getState> obtiene la funcion de getState que sria algo como
+// <typeof store.getState> obtiene la funcion de getState que seria algo como
 const getState = () => ({
   counter: 0,
-  // como objeto
-   counter: { counter: 0},
+  // o como un objeto
+  counter: { counter: 0},
 });
+
 // ReturnType obtiene el tipo que retorna esa funcion que será
 {
   counter: 0,
 }
 // si el estado fuera un objeto se veria asi
-
 {
   counter: { counter: 0},
 }
@@ -475,3 +475,33 @@ const store = configureStore({
 - ¿Es necesario? Sí, es necesario cuando usas RTK Query. Si no lo incluyes, las operaciones de RTK Query no funcionarán correctamente y recibirás errores en la consola sobre la falta de middleware.
 
 > El cache por defecto tiene 1 minuto de duracion
+
+### Fechas serializadas (toISOString)
+
+Cuando trabajamos con fechas en JavaScript, es importante entender cómo manejar su serialización, especialmente cuando las enviamos a través de APIs o las guardamos en almacenamiento persistente.
+
+1. Las fechas en JavaScript no son serializables directamente: Si intentamos serializar un objeto Date directamente, no obtendremos una representación adecuada para enviarla o almacenarla. El objeto Date en JavaScript contiene métodos y propiedades, pero no es compatible con la serialización estándar, como JSON.stringify().
+1. Solución - Usar toISOString(): La forma más común de serializar una fecha es utilizando el método toISOString(). Este método convierte el objeto Date en una cadena de texto en formato ISO 8601 ("YYYY-MM-DDTHH:mm:ss.sssZ"), que es una representación estándar y fácilmente interpretable por otros sistemas.
+
+```js
+const date = new Date();
+const serializedDate = date.toISOString();
+console.log(serializedDate); // Ejemplo: "2025-03-05T22:56:52.936Z"
+```
+
+Este formato es tanto legible como compatible con diversas plataformas y bases de datos, y puede ser fácilmente deserializado usando new Date() en el cliente o el servidor.
+
+1. Serialización con JSON.stringify(): Al serializar un objeto con JSON.stringify(), las fechas se convierten automáticamente en cadenas usando el formato toISOString(). Sin embargo, es importante recordar que si usamos JSON.parse() para deserializar, las fechas no se restaurarán como objetos Date automáticamente; necesitaríamos un paso adicional para convertirlas de nuevo a instancias de Date.
+
+```js
+const obj = { timestamp: new Date() };
+const serialized = JSON.stringify(obj);
+console.log(serialized); // Ejemplo: '{"timestamp":"2025-03-05T22:56:52.936Z"}'
+
+// Deserializar y convertir a Date nuevamente
+const parsed = JSON.parse(serialized);
+parsed.timestamp = new Date(parsed.timestamp);
+console.log(parsed.timestamp instanceof Date); // true
+```
+
+Algunos sistemas (como Redux o algunas bases de datos) pueden no ser capaces de manejar objetos Date directamente. La serialización a una cadena evita problemas al trabajar con estas tecnologías.
