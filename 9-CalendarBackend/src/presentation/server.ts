@@ -27,6 +27,7 @@ export class Server {
     //   console.log("Origin:", req.headers.origin);
     //   next();
     // });
+    console.log(this.origin);
     // this.app.use(morgan("dev"));
     this.app.use(cookieParser());
     this.app.use(express.static(this.public_path));
