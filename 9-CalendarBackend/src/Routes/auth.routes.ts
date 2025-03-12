@@ -17,6 +17,7 @@ export class AuthRoutes {
       AuthMiddleware.validateJWT,
       authController.refreshToken
     );
+    router.get("/logout", AuthMiddleware.validateJWT, authController.logout);
 
     return router;
   }

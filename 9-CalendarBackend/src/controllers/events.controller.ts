@@ -74,7 +74,7 @@ export class EventsController {
 
   updateEvent = async (req: Request, res: Response) => {
     const idEvent = req.params["id"];
-    const { x_user } = req.body;
+    const { x_user, ...body } = req.body;
     try {
       const findEvent = await this.eventDatasource.findEventById(idEvent);
       if (!findEvent) {
@@ -92,7 +92,7 @@ export class EventsController {
         return;
       }
 
-      const newUpdateEvent = { ...req.body, user: x_user.id };
+      const newUpdateEvent = { ...body, user: x_user.id };
 
       const updateEvent = await this.eventDatasource.updateEvent(
         idEvent,

@@ -1,28 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Event } from "../../types";
-import { addHours } from "date-fns";
-
-const event: Event = {
-  _id: 21367913267312,
-  title: "Meeting",
-  notes: "Reunion",
-  start: new Date(),
-  end: addHours(new Date(), 2),
-  bgColor: "#fafafa",
-  user: {
-    id: "123",
-    name: "Ingi",
-  },
-};
 
 interface InitialState {
   events: Event[];
   activeEvent: Event | null;
+  isLoadingEvents: boolean;
 }
 
 export const initialState: InitialState = {
-  events: [event],
+  events: [],
   activeEvent: null,
+  isLoadingEvents: false,
 };
 
 export const calendarSlice = createSlice({
@@ -38,19 +26,38 @@ export const calendarSlice = createSlice({
     },
     updateEvent: (state, action: PayloadAction<Event>) => {
       state.events = state.events.map((event) =>
-        event._id === action.payload._id ? action.payload : event
+        event.id === action.payload.id ? action.payload : event
       );
       state.activeEvent = null;
     },
     deleteEvent: (state) => {
       state.events = state.events.filter(
-        (event) => event._id !== state.activeEvent?._id
+        (event) => event.id !== state.activeEvent?.id
       );
       state.activeEvent = null;
+    },
+    loadingEvents: (state, { payload }: PayloadAction<Event[]>) => {
+      // state.events = payload;
+      state.isLoadingEvents = false;
+      payload.forEach((event) => {
+        const exists = state.events.some((dbEvent) => dbEvent.id === event.id);
+        if (!exists) state.events.push(event);
+      });
+    },
+    cleanEvents: (state) => {
+      // state.isLoadingEvents=true
+      state.activeEvent = null;
+      state.events = [];
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setActiveEvent, addNewEvent, updateEvent, deleteEvent } =
-  calendarSlice.actions;
+export const {
+  setActiveEvent,
+  addNewEvent,
+  updateEvent,
+  deleteEvent,
+  loadingEvents,
+  cleanEvents,
+} = calendarSlice.actions;

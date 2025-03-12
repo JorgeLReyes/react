@@ -1,8 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuthStore } from "../../hooks/useAuthStore";
 
 export const AuthRoutes = () => {
-  type Auth = "authenticated" | "not-authenticated";
-  const auth: Auth = "authenticated";
+  const { status } = useAuthStore();
 
-  return <>{auth === "not-authenticated" ? <Outlet /> : <Navigate to="/" />}</>;
+  return (
+    <>{status === "not-authenticated" ? <Outlet /> : <Navigate to="/" />}</>
+  );
 };

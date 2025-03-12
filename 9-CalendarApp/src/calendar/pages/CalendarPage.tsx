@@ -10,17 +10,22 @@ import {
   Navbar,
 } from "../components";
 import { Event } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCalendarStore, useUiStore } from "../../hooks";
+import { useAuthStore } from "../../hooks/useAuthStore";
 
 export const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { onOpenModal } = useUiStore();
-  const { events, onActiveEvent, activeEvent } = useCalendarStore();
-
+  const { user } = useAuthStore();
+  const { events, onActiveEvent, startLoadingEvents } = useCalendarStore();
   const [view, setView] = useState<View>(
     (localStorage.getItem("lastView") as View) || "week"
   );
+
+  useEffect(() => {
+    startLoadingEvents();
+  }, []);
 
   const eventStyleGetter = (
     event: Event,
@@ -28,8 +33,12 @@ export const CalendarPage = () => {
     end: Date,
     isSelected: boolean
   ) => {
+    console.log(event);
     const style = {
-      backgroundColor: "#347cf7",
+      backgroundColor:
+        event.user?.uid || event.user?._id === user?.uid
+          ? "#347cf7"
+          : "#465660",
       borderRadius: "0px",
       opacity: 0.8,
       border: "0",

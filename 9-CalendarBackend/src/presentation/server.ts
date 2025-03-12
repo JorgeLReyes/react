@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import morgan from "morgan";
 interface Options {
   port: number;
   routes: Router;
@@ -21,11 +21,16 @@ export class Server {
   }
 
   start() {
+    // this.app.use((req, res, next) => {
+    //   console.log("Origin:", req.headers.origin);
+    //   next();
+    // });
+    this.app.use(morgan("dev"));
     this.app.use(cookieParser());
     this.app.use(express.static(this.public_path));
     this.app.use(
       cors({
-        origin: ["http://localhost:3001"],
+        origin: ["http://localhost:5173"],
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],

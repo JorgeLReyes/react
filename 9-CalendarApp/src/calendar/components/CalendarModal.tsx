@@ -6,8 +6,6 @@ import { addHours, differenceInDays, startOfDay, endOfDay } from "date-fns";
 import { Event } from "../../types";
 import "react-datepicker/dist/react-datepicker.css";
 import { es } from "date-fns/locale/es";
-import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
 import { useCalendarStore, useUiStore } from "../../hooks";
 registerLocale("es", es);
 
@@ -84,7 +82,7 @@ export const CalendarModal = () => {
 
     await startSavingEvent({
       ...form,
-      _id: activeEvent?._id,
+      id: activeEvent?.id,
     });
     setFormSubmitted(false);
     onCloseModal();
@@ -105,7 +103,11 @@ export const CalendarModal = () => {
         <form className="container" onSubmit={onSubmit}>
           <div className="form-group mb-2">
             <label>Fecha y hora inicio</label>
-            {/* <input className="form-control" placeholder="Fecha inicio" /> */}
+            {/* <input
+              className="form-control"
+              placeholder="Fecha inicio"
+              type="date"
+            /> */}
             <DatePicker
               className="form-control"
               minDate={new Date()}

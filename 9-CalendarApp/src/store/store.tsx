@@ -1,10 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { ReactNode } from "react";
 import { Provider } from "react-redux";
-import { uiSlice, calendarSlice } from ".";
+import { uiSlice, calendarSlice, authSlice } from ".";
 
 const store = configureStore({
   reducer: {
+    auth: authSlice.reducer,
     ui: uiSlice.reducer,
     calendar: calendarSlice.reducer,
   },

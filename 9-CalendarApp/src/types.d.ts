@@ -10,21 +10,21 @@ export interface CalendarEventProps {
 }
 
 export interface Event {
+  id?: number;
   _id?: number;
   title?: string;
   notes?: string;
   start: Date;
   end: Date;
   bgColor?: string;
-  user?: {
-    id: string;
-    name: string;
-  };
+  user?: User;
 }
 
 export interface User {
-  id: string;
   name: string;
+  email: string;
+  uid: string;
+  _id?: string;
 }
 
 export interface Localizer {
