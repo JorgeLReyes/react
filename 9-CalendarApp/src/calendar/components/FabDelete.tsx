@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { useCalendarStore, useUiStore } from "../../hooks";
+import { useCalendarStore } from "../../hooks";
 
 export const FabDelete = () => {
   const { startDeletingEvent, activeEvent } = useCalendarStore();

@@ -6,6 +6,7 @@ interface Options {
   port: number;
   routes: Router;
   public_path?: string;
+  origin: string[];
 }
 
 export class Server {
@@ -13,11 +14,12 @@ export class Server {
   private readonly routes: Router;
   private readonly port: number;
   private readonly public_path: string;
-
+  private readonly origin: string[];
   constructor(options: Options) {
     this.port = options.port;
     this.public_path = options.public_path || "public";
     this.routes = options.routes;
+    this.origin = options.origin;
   }
 
   start() {
@@ -25,12 +27,12 @@ export class Server {
     //   console.log("Origin:", req.headers.origin);
     //   next();
     // });
-    this.app.use(morgan("dev"));
+    // this.app.use(morgan("dev"));
     this.app.use(cookieParser());
     this.app.use(express.static(this.public_path));
     this.app.use(
       cors({
-        origin: ["http://localhost:5173"],
+        origin: this.origin,
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],

@@ -7,4 +7,5 @@ export const envs = {
   MONGODB_NAME: get("MONGODB_NAME").required().asString(),
   MONGODB_URL: get("MONGODB_URL").required().asString(),
   SEED: get("SEED").required().asString(),
+  ORIGIN: get("ORIGIN").required().asArray(),
 };
