@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
+  checking,
   clearErrorMessage,
   customErrorMessage,
   onLogin,
@@ -24,6 +25,7 @@ export const useAuthStore = () => {
     email: string;
     password: string;
   }) => {
+    dispatch(checking());
     try {
       const data = await api.post<User & { ok: boolean }>("/auth", {
         email,
@@ -32,6 +34,7 @@ export const useAuthStore = () => {
       const { ok, ...user } = data.data;
       dispatch(onLogin(user));
     } catch (error) {
+      console.log(error);
       dispatch(onLogout("Credenciales incorrectas"));
       setTimeout(() => {
         dispatch(clearErrorMessage());

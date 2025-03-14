@@ -1,36 +1,12 @@
 import {
   createBrowserRouter,
   Navigate,
-  Outlet,
   RouterProvider,
 } from "react-router-dom";
 import { LoginPage } from "../auth";
 import { CalendarPage } from "../calendar";
-import { useAuthStore } from "../hooks/useAuthStore";
-import { useEffect } from "react";
 import CheckRoute from "./components/CheckRoute";
-
-const App = () => {
-  const { status, checkAuthToken } = useAuthStore();
-  useEffect(() => {
-    checkAuthToken();
-  }, []);
-
-  if (status === "cheking") return <></>;
-
-  return <Outlet />;
-
-  // if (status === "not-authenticated") {
-  //   return (
-  //     <>
-  //       <Navigate to="/auth/" />
-  //       <Outlet />
-  //     </>
-  //   );
-  // }
-  /* <Navigate to="/" /> */
-  /* <Outlet /> */
-};
+import { App } from "./components/App";
 
 const router = createBrowserRouter([
   {

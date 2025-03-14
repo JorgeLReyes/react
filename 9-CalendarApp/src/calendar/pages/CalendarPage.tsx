@@ -28,10 +28,10 @@ export const CalendarPage = () => {
   }, []);
 
   const eventStyleGetter = (
-    event: Event,
-    start: Date,
-    end: Date,
-    isSelected: boolean
+    event: Event
+    // start: Date,
+    // end: Date,
+    // isSelected: boolean
   ) => {
     console.log(event);
     const style = {

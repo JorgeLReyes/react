@@ -221,6 +221,19 @@ test("counter debe aumentar en 1 - act", () => {
 | `act`       | Agrupa actualizaciones de estado y asegura que React procese los cambios antes de continuar con la prueba. Se usa tanto para actualizaciones síncronas como asíncronas, pero **no espera** que una promesa termine. | Cuando necesitas que React re-renderice el componente antes de hacer aserciones. En actualizaciones asíncronas, se combina con `waitFor` si es necesario. |
 | `waitFor`   | Reintenta ejecutar un callback varias veces hasta que la condición se cumpla o se agote el tiempo de espera.                                                                                                        | Cuando esperas que el estado o el DOM se actualicen de forma asíncrona y necesitas asegurarte de que el cambio haya ocurrido.                             |
 
+#### renderHook con providers
+
+Cuando se prueba un hook que depende del contexto (como Redux), se debe usar el segundo argumento de renderHook para envolverlo en un Provider:
+
+```jsx
+const { result } = renderHook(() => useUiStore(), {
+  wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
+});
+```
+
+- El wrapper debe incluir {children}, ya que representa el componente interno donde se ejecuta el hook.
+- Si se omite {children}, el Provider no renderizará nada y el hook no tendrá acceso al contexto de Redux, lo que provocará errores.
+
 #### Probar con un context
 
 Cuando usamos un componente con useContext debemos indicarle de donde obtendrá su contexto porque para el test no existe, asi que usaremos el provider del context y le pasaremos los valores que deseamos que el compontente hijo tenga
@@ -373,6 +386,12 @@ import styles from "./styles.css";
 
 ```
 
+> Si solo quieres espiar sin cambiar la implementación → jest.spyOn()
+>
+> Si quieres espiar y además mockear, usa jest.spyOn().mockImplementation()
+>
+> Por ultimo hacemos spy.mockRestore para recuperear la implementacion en caso de haberla cambiado
+
 ### Pruebas con router
 
 #### MemoryRouter
@@ -508,3 +527,6 @@ En tests con Redux, preloadedState es útil para establecer un estado inicial es
 - Para simular estados específicos, como un usuario autenticado o no autenticado.
 - Para evitar la influencia del estado inicial del reducer en las pruebas.
 - Para testear componentes con un estado predefinido sin necesidad de ejecutar acciones previas.
+
+> Notas:
+> Cuando usas jest.mock() sin una implementación personalizada, el objeto exportado se mantiene como un objeto, pero todas sus propiedades (sean funciones o valores) se convierten en funciones simuladas (jest.fn()), incluso si esas propiedades originalmente no eran funciones.
