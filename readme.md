@@ -823,3 +823,139 @@ const Main = ({ texts, auth }: { texts: Translations, auth: boolean }) => {
 - Las keys solo tienen que ser únicas entre hermanos, pero podemos usarlas en diferentes arrays.
 - Cuando usamos un key diferente en cada render, React considera que el componente es nuevo y no reutiliza el anterior, lo que provoca un unmount (desmontaje) y un mount (montaje) nuevamente.
 - Si actualizas el estado dentro de una promesa, React no las agrupará automáticamente, lo que provoca un re-render adicional. Sin embargo, si actualizas ambos estados dentro de la misma función asincrónica, React puede agrupar esas actualizaciones y hacer solo un render.
+
+# REACT 19 - FERNANDO HERRRERA
+
+## "Hook" Use
+
+use es un "hook" que permite manejar recursos asíncronos de forma sencilla y directa, sin la necesidad de depender de los patrones tradicionales como useEffect y useState. Este hook se utiliza de manera similar a otros hooks, pero con una diferencia importante: puede ser llamado en condicionales y dentro de otras funciones, lo cual no es posible con otros hooks tradicionales como useState o useMemo.
+
+El hook use puede ser utilizado para obtener datos de una API u otros recursos asincrónicos. Su uso básico es el siguiente:
+
+```js
+const planets2: Planet[] = use(Promise);
+```
+
+> Uncaught Error: async/await is not yet supported in Client Components, only Server Components. This error is often caused by accidentally adding `'use client'` to a module that was originally written for the server.
+
+1. El hook use debe estar dentro de un componente envuelto en Suspense
+
+El hook use se utiliza para obtener recursos asíncronos, y es compatible con el sistema de Suspense de React. Suspense es un mecanismo que permite "suspender" el renderizado de un componente hasta que la promesa asociada se haya resuelto. De esta forma, se evita renderizar componentes incompletos o con datos pendientes.
+
+¿Por qué Suspense? Suspense permite a React esperar la resolución de una promesa y suspender el renderizado hasta que los datos estén disponibles, lo que proporciona una experiencia de carga más fluida.
+
+2. La promesa debe ser pasada como prop o utilizada fuera del componente
+
+- Pasar la promesa como prop: Si la promesa proviene de un recurso externo, es una buena práctica pasarla como prop desde un componente superior en lugar de crearla dentro del componente.
+
+- No debes definir la promesa dentro del componente: Es importante que las promesas no se definan dentro de los componentes, ya que puede causar que React las trate como dependencias que cambian constantemente, lo que afectaría la ejecución de use y haría que el componente se renderice varias veces.
+
+```js
+import { FC, use } from "react";
+import { Suspense } from "react";
+import { Planet } from "../interfaces/planet.interface";
+import { PlanetList } from "./ui/PlanetList";
+import { getPlanets } from "../actions/getPlanets";
+
+// Componente de presentación para mostrar los planetas
+const Planets: FC<{ planetsPromise: Promise<Planet[]> }> = ({
+  planetsPromise,
+}) => {
+  const planets = use(planetsPromise); // Usar la promesa pasada como prop
+  return (
+    <div>
+      <h4>Listado de Planetas</h4>
+      <PlanetList planets={planets} />
+    </div>
+  );
+};
+
+// Componente principal donde se pasa la promesa
+const App: FC = () => {
+  const planetsPromise = getPlanets(); // Definir la promesa fuera del componente
+  return (
+    <Suspense fallback={<div>Cargando planetas...</div>}>
+      <Planets planetsPromise={planetsPromise} />
+    </Suspense>
+  );
+};
+
+export default App;
+```
+
+Suspensión de renderizado: Suspense no se usa para suspender la ejecución de funciones o el flujo de código. En cambio, suspende el proceso de renderizado de un componente hasta que se resuelva la promesa que contiene.
+
+### Suspense
+
+Recibe como propiead el `fallback` que es una propiedad que renderiza un componente o elemento JSX mientras se realiza la peticion
+
+### ErrorBoundary
+
+> https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary
+
+Nosotros debemos crear el componente y debe ser un class Component. Pero este componente debe cumplir con los siguientes aspectos:
+
+- un estado que controle el error (booleano)
+- Dos propieades que son:
+  - fallback que es un componente en caso de que la peticion falle
+  - children que son los componentes que envuelve este componente
+- Debe tener una funcion estatica llamada getDerivedStateFromError que recibe como parametro un error
+- Debe tener una funcion de instancia llamada componentDidCatch que recibe como parametro un error e info (que es un ErroInfo)
+
+`getDerivedStateFromError` es una funcion estatica que react internamente busca y lo que retorne es lo que añade o modifica en el estado de dicho componente
+
+`componentDidCatch` es similar a getDerivedStateFromError pero en esta nosotros debemos hacer la actualizacion del estado manual
+
+Ambas funciones se llaman unicamente cuando hay un error en la peticion del componente hijo
+
+`¿Cómo React sabe que un componente es un ErrorBoundary?`
+React lo detecta porque el componente:
+
+- Extiende de Component (es una clase).
+- Implementa getDerivedStateFromError o componentDidCatch.
+- Si un componente de clase tiene al menos uno de estos métodos, React lo considera automáticamente un Error Boundary, sin importar cómo se llame.
+
+## useActionState
+
+1. Tres valores de retorno:
+
+- state: El estado actual, que almacena los datos de tu formulario o cualquier estado relacionado.
+- formAction: Una función que se utiliza para disparar acciones que actualizan el estado, de forma similar a un dispatch de Redux.
+- isPending: Un indicador booleano que puede ser usado para saber si una acción o actualización está en curso (por ejemplo, para mostrar un spinner o manejar un estado de carga).
+
+2. Recibe una función de callback (cb) y un initialState:
+
+- La callback que pasas al hook toma como parámetros el estado actual y el formData (o cualquier otro objeto necesario para actualizar el estado). Esta función se ejecuta cuando llamas a formAction, actualizando así el estado basado en esa lógica.
+
+3. La función formAction:
+
+- Esta función es como un dispatcher: llama internamente a la callback con los datos adecuados. Puede ser sincrónica o asincrónica.
+- Si es asincrónica, lo más probable es que se manejen promesas, estados de carga (isPending) y cambios de estado para reflejar la actualización.
+
+```js
+  const [, formAction, isPending] = useActionState(
+    async (prevState: unknown, queryData: FormData) => {
+      const planet = await createPlanetAction(prevState, queryData);
+      onAddPlanet(planet!);
+    },
+    null
+  );
+
+  return (
+    <form className="mb-4 flex flex-col md:flex-row" action={formAction}>)
+```
+
+## useFormStatus
+
+Se usa para delegar la creación de un componente y tiene que reaccionar basado en un formulario
+Busca el formulario padre mas cercano del boton y toma ciertos datos
+
+```js
+const status = useFormStatus();
+```
+
+## useOptimistic
+
+> PlanetList.tsx:24 An optimistic state update occurred outside a transition or action. To fix, move the update to an action, or wrap with startTransition.
+
+> Queda pendiente

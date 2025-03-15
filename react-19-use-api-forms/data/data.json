@@ -2,13 +2,13 @@
   "planets": [
     {
       "id": "a1b2c3",
-      "name": "Mercurio",
+      "name": "MERCURIO",
       "type": "Planeta",
       "distanceFromSun": "57.91 millones de km"
     },
     {
       "id": "d4e5f6",
-      "name": "Venus",
+      "name": "VENUS",
       "type": "Planeta",
       "distanceFromSun": "108.2 millones de km"
     },
