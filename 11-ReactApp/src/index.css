@@ -22,7 +22,7 @@ code {
 
 nav {
   background-color: #363a45;
-  height: 100vh;
+  /* height: 100vh; */
   margin-right: 15px;
   overflow-y: auto;
   text-align: center;
