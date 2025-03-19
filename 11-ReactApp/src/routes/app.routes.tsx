@@ -1,10 +1,16 @@
 import {
   createBrowserRouter,
   Link,
-  Outlet,
+  Navigate,
   RouterProvider,
 } from "react-router-dom";
 import App from "../App";
+import ShoppingPages from "../02-component-patterns/pages/ShoppingPages";
+
+// const Lazy = lazy(
+//   () =>
+//     import(/* webpackChunkName: "LP"*/ "../01-lazyload/components/LazyLayout")
+// );
 
 const router = createBrowserRouter([
   {
@@ -19,23 +25,20 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <h1>Home</h1>,
+        element: <ShoppingPages />,
       },
       {
-        path: "about",
-        element: (
-          <>
-            <h1>About</h1>
-            <Outlet />
-          </>
-        ),
-      },
-      {
-        path: "users",
-        element: <h1>Users</h1>,
+        path: "*",
+        element: <Navigate to={"/"} />,
       },
     ],
   },
 ]);
 
-export const AppRouter = () => <RouterProvider router={router} />;
+export const AppRouter = () => {
+  return (
+    // <Suspense fallback={<h1>Loading...</h1>}>
+    <RouterProvider router={router} />
+    // </Suspense>
+  );
+};

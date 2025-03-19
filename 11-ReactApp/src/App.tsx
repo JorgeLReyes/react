@@ -6,15 +6,16 @@ function App() {
     <div className="main-layout">
       <nav>
         <img src={logo} alt="React logo" />
+        {/* <ul>
+          {Object.entries(routes).map(([, value]) => (
+            <li key={value.to}>
+              <NavLink to={value.to}>{value.name}</NavLink>
+            </li>
+          ))}
+        </ul> */}
         <ul>
           <li>
-            <NavLink to={"/"}>Home</NavLink>
-          </li>
-          <li>
-            <NavLink to={"/about"}>About</NavLink>
-          </li>
-          <li>
-            <NavLink to={"/users"}>Users</NavLink>
+            <NavLink to="/shopping">Shopping</NavLink>
           </li>
         </ul>
       </nav>

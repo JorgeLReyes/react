@@ -959,3 +959,28 @@ const status = useFormStatus();
 > PlanetList.tsx:24 An optimistic state update occurred outside a transition or action. To fix, move the update to an action, or wrap with startTransition.
 
 > Queda pendiente
+
+## LazyLoad (carga perezosa)
+
+lazy es ua funcion que permite cargar un componnente hasta que es utilizado.
+La manera en que se usa es la siguiente:
+
+```js
+const Lazy = lazy(() =>
+  import(/* webpackChunkName: "LP1"*/ "../01-lazyload/pages/LazyPage1")
+);
+```
+
+Lazy recibe una funcion que debe retornar un import con el path del componente al que se le quiere agregar el lazy o carga perezosa, y este archivo debe exportar el componente por default
+
+Los componentes que usan lazy debemos envolverlos en el componente de Suspense que ayudará a saber que el componente se esta cargando. Es un componente que envuelve a otros componentes y sirve para indicarle a react que se esta cargando un componente pero mientras sucede ese proceso muestre el componente del fallback
+
+```js
+<Suspense fallback={<Componente />}>{children}</Suspense>
+```
+
+Si queremos que un componente padre sea lazy, esto hará que sus hijos se cargen hasta que se use este componente, y si queremos este comportamiento pero usamos `createBrowserRouter` no podemos definir a los hijos en el router principal como children, si no que dentro del padre debemos definir las rutas hijas con el componente <Routes> con sus rutas <Route> definidas
+
+## Compound Component Pattern
+
+El componente padre recibe a sus hijos definidos entre la apertura y cierre de sus etiquetas.
