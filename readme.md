@@ -1013,3 +1013,7 @@ usualmente este patrón es el que se utiliza de manera tradicional en formulario
     onChange={ alguna función que cambia el valor }
 />
 ```
+
+## State Initializer Pattern (Render Props)
+
+El patrón principalmente pide que se pueda ofrecer un estado inicial y una forma de re-establecer el estado a su forma original mpero se puede extender exponiendo funciones y nuevas propiedades.
