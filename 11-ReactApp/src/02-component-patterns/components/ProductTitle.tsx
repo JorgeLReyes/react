@@ -10,8 +10,8 @@ interface Props {
 export const ProductTitle = ({ className = "", style }: Props) => {
   const { product } = useContext(ProductContext);
   return (
-    <span className={`${styles.productDescription} ${className}`} style={style}>
+    <p className={`${styles.productDescription} ${className}`} style={style}>
       {product.title}
-    </span>
+    </p>
   );
 };

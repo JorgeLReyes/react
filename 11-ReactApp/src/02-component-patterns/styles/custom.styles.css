@@ -10,6 +10,7 @@
   padding: 10px;
   width: calc(100% - 20px);
   border-radius: 20px;
+  aspect-ratio: 1 / 1;
 }
 
 .custom-buttons button {
@@ -19,4 +20,13 @@
 
 .custom-buttons > div {
   border-color: white;
+}
+.shopping-card {
+  position: fixed;
+  top: 0;
+  right: 10px;
+}
+
+[class*="_productCard"]:hover {
+  z-index: 3;
 }

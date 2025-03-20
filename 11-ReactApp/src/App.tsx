@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 import logo from "../public/vite.svg";
+
 function App() {
   return (
     <div className="main-layout">

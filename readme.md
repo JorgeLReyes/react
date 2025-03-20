@@ -984,3 +984,32 @@ Si queremos que un componente padre sea lazy, esto hará que sus hijos se cargen
 ## Compound Component Pattern
 
 El componente padre recibe a sus hijos definidos entre la apertura y cierre de sus etiquetas.
+
+```js
+<Componente>
+  <Hijo1 />
+  <Hijo2 />
+  <Hijo3 />
+</Componente>
+```
+
+## Extensible Styles Pattern
+
+Permitir al consumidor del componente para poder personalizar los estilos de los componentes
+
+```js
+<Componente styles={} className={}></Componente>
+```
+
+Estos styles con de tipo style:`React.CSSProperties`;
+
+## Control Props Pattern
+
+usualmente este patrón es el que se utiliza de manera tradicional en formularios, es decir:
+
+```jsx
+<input
+    value={  algún valor de solo lectura }
+    onChange={ alguna función que cambia el valor }
+/>
+```

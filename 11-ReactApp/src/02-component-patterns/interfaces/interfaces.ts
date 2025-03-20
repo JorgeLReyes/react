@@ -20,3 +20,8 @@ export interface ProductCardComponents {
   Image: typeof ProductImage;
   Buttons: typeof ProductButtons;
 }
+
+export interface onChangeArgs {
+  product: Product;
+  count: number;
+}

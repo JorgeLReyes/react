@@ -1,14 +1,16 @@
+import { PropsWithChildren } from "react";
 import styles from "../styles/styles.module.css";
 import useProduct from "../hooks/useProduct";
 // import { ProductImage, ProductButtons, ProductTitle } from "./";
 import { ProductContext } from "../context/productContext";
-import { Product } from "../interfaces/interfaces";
-import { PropsWithChildren } from "react";
+import type { onChangeArgs, Product } from "../interfaces/interfaces";
 
 export interface Props extends PropsWithChildren {
   product: Product;
   className?: string;
   style?: React.CSSProperties;
+  value?: number;
+  onChange?: (args: onChangeArgs) => void;
 }
 
 export const ProductCard = ({
@@ -16,8 +18,14 @@ export const ProductCard = ({
   children,
   className = "",
   style,
+  value = 0,
+  onChange,
 }: Props) => {
-  const { counter, increaseBy } = useProduct(0);
+  const { counter, increaseBy } = useProduct({
+    initialValue: value,
+    onChange,
+    product,
+  });
 
   return (
     <>
