@@ -5,6 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "../App";
+import { RegisterPage } from "../03-forms/pages/RegisterPage";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <h1>Users</h1>,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
       },
     ],
   },

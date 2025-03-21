@@ -16,6 +16,9 @@ function App() {
           <li>
             <NavLink to={"/users"}>Users</NavLink>
           </li>
+          <li>
+            <NavLink to={"/register"}>Register</NavLink>
+          </li>
         </ul>
       </nav>
       <Outlet />
