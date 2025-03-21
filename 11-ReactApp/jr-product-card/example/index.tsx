@@ -1,14 +1,18 @@
-import { ProductCard } from "../components";
+import 'react-app-polyfill/ie11';
+import * as React from 'react';
+import { createRoot } from 'react-dom/client';
+import { ProductCard } from '../.';
+
 const product = {
-  id: "1",
-  title: "Coffee mug",
-  img: "./coffee-mug.png",
+  id: '1',
+  title: 'Coffee mug',
+  img: './coffee-mug.png',
 };
 
-export const ShoppingPages = () => {
+const App = () => {
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
         <ProductCard
           key={product.id}
           product={product}
@@ -31,4 +35,5 @@ export const ShoppingPages = () => {
   );
 };
 
-export default ShoppingPages;
+createRoot(document.getElementById('root')!).render(<App />);
+// ReactDOM.render(<App />, document.getElementById('root'));
