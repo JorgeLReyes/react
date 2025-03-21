@@ -50,11 +50,11 @@ export const ProductCard = ({
         <div className={`${styles.productCard} ${className}`} style={style}>
           {children({
             count: counter,
+            increaseBy,
+            maxCount,
             isValueMax,
             reset,
-            maxCount,
             product,
-            increaseBy,
           })}
         </div>
       </ProductContext.Provider>

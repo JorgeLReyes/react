@@ -18,11 +18,16 @@ export const ProductButtons = ({ className = '', style }: Props) => {
 
   return (
     <div className={`${styles.buttonsContainer} ${className}`} style={style}>
-      <button className={styles.buttonMinus} onClick={() => increaseBy(-1)}>
+      <button
+        data-testid="decrement"
+        className={styles.buttonMinus}
+        onClick={() => increaseBy(-1)}
+      >
         -
       </button>
       <div className={styles.countLabel}>{counter}</div>
       <button
+        data-testid="increment"
         className={`${styles.buttonAdd} ${isValueMax() ? styles.disabled : ''}`}
         disabled={isValueMax()}
         onClick={() => increaseBy(1)}
