@@ -8,16 +8,21 @@ function App() {
         <img src={logo} alt="React logo" />
         <ul>
           <li>
-            <NavLink to={"/"}>Home</NavLink>
-          </li>
-          <li>
-            <NavLink to={"/about"}>About</NavLink>
-          </li>
-          <li>
-            <NavLink to={"/users"}>Users</NavLink>
-          </li>
-          <li>
             <NavLink to={"/register"}>Register</NavLink>
+          </li>
+          <li>
+            <NavLink to={"/Formik/"} end>
+              Formik
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to={"/Formik/yup"}>Formik Yup</NavLink>
+          </li>
+          <li>
+            <NavLink to={"/Formik/components"}>Formik Components</NavLink>
+          </li>
+          <li>
+            <NavLink to={"/Formik/abstraction"}>Formik abstraction</NavLink>
           </li>
         </ul>
       </nav>

@@ -6,6 +6,10 @@ import {
 } from "react-router-dom";
 import App from "../App";
 import { RegisterPage } from "../03-forms/pages/RegisterPage";
+import { FormikPage } from "../03-forms/pages/FormikPage";
+import { FormikYupPage } from "../03-forms/pages/FormikYupPage";
+import { FormikComponents } from "../03-forms/pages/FormikComponents";
+import { FormikAbstraction } from "../03-forms/pages/FormikAbstraction";
 
 const router = createBrowserRouter([
   {
@@ -19,25 +23,30 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true,
-        element: <h1>Home</h1>,
-      },
-      {
-        path: "about",
-        element: (
-          <>
-            <h1>About</h1>
-            <Outlet />
-          </>
-        ),
-      },
-      {
-        path: "users",
-        element: <h1>Users</h1>,
-      },
-      {
         path: "register",
         element: <RegisterPage />,
+      },
+      {
+        path: "formik",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <FormikPage />,
+          },
+          {
+            path: "yup",
+            element: <FormikYupPage />,
+          },
+          {
+            path: "components",
+            element: <FormikComponents />,
+          },
+          {
+            path: "abstraction",
+            element: <FormikAbstraction />,
+          },
+        ],
       },
     ],
   },
