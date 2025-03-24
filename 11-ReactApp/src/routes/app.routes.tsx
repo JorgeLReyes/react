@@ -10,6 +10,8 @@ import { FormikPage } from "../03-forms/pages/FormikPage";
 import { FormikYupPage } from "../03-forms/pages/FormikYupPage";
 import { FormikComponents } from "../03-forms/pages/FormikComponents";
 import { FormikAbstraction } from "../03-forms/pages/FormikAbstraction";
+import { RegisterFormikPage } from "../03-forms/pages/RegisterFormikPage";
+import { DynamicForm } from "../03-forms/pages/DynamicForm";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +26,17 @@ const router = createBrowserRouter([
     children: [
       {
         path: "register",
-        element: <RegisterPage />,
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <RegisterPage />,
+          },
+          {
+            path: "formik",
+            element: <RegisterFormikPage />,
+          },
+        ],
       },
       {
         path: "formik",
@@ -47,6 +59,10 @@ const router = createBrowserRouter([
             element: <FormikAbstraction />,
           },
         ],
+      },
+      {
+        path: "dynamic",
+        element: <DynamicForm />,
       },
     ],
   },

@@ -1,0 +1,63 @@
+[
+  {
+    "type": "input",
+    "name": "firstName",
+    "placeholder": "Enter your first name",
+    "label": "First Name",
+    "value": "First",
+    "validations": [
+      {
+        "type": "required"
+      },
+      {
+        "type": "minLength",
+        "value": 5
+      }
+    ]
+  },
+  {
+    "type": "input",
+    "name": "lastName",
+    "placeholder": "Enter your last name",
+    "label": "Last Name",
+    "value": "",
+    "validations": [
+      {
+        "type": "required"
+      }
+    ]
+  },
+  {
+    "type": "email",
+    "name": "email",
+    "placeholder": "Enter your email",
+    "label": "Enter your email",
+    "value": "",
+    "validations": [
+      {
+        "type": "required"
+      },
+      {
+        "type": "email",
+        "value": "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+      }
+    ]
+  },
+  {
+    "as": "select",
+    "name": "favoriteGame",
+    "placeholder": "Enter your email",
+    "label": "Enter your email",
+    "value": "",
+    "options": [
+      { "id": 1, "label": "Game 1" },
+      { "id": 2, "label": "Game 2" },
+      { "id": 3, "label": "Game 3" }
+    ],
+    "validations": [
+      {
+        "type": "required"
+      }
+    ]
+  }
+]

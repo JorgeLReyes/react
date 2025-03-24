@@ -8,7 +8,12 @@ function App() {
         <img src={logo} alt="React logo" />
         <ul>
           <li>
-            <NavLink to={"/register"}>Register</NavLink>
+            <NavLink to={"/register"} end>
+              Register
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to={"/register/formik"}>Register formik</NavLink>
           </li>
           <li>
             <NavLink to={"/Formik/"} end>
@@ -23,6 +28,9 @@ function App() {
           </li>
           <li>
             <NavLink to={"/Formik/abstraction"}>Formik abstraction</NavLink>
+          </li>
+          <li>
+            <NavLink to={"/dynamic"}>Dynamic Form</NavLink>
           </li>
         </ul>
       </nav>
