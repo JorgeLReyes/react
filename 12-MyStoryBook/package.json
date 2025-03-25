@@ -1,8 +1,21 @@
 {
-  "name": "package.json",
+  "name": "jr-custom-components",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "keywords": [
+    "react",
+    "dev",
+    "jr"
+  ],
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "license": "MIT",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "dev": "npm run storybook",
     "build": "tsc -b && vite build",
@@ -10,10 +23,6 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
