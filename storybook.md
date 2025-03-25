@@ -22,6 +22,11 @@ const meta = {
 export default meta;
 ```
 
+Es importante mecionar que si usamos una interfaz para definir las propiedades esta la exportemos, ya que:
+
+- Podemos usar directamente la interfaz en el generico evitando usar `typeof Component`
+- Si usamos el generico accediendo al tipo de Componente al momento de hacer la transpilacion obtendremos un warning/error ya que en este caso si se necesita que la interfaz este exportada explicitamente, es decir, al momento de analizar el tipado del Componente encontrara el nombre de esta interfaz y por ende necesitará acceder a esta.
+
 ### Mas props
 
 Esta la propiedad `argTypes` donde podemos forzar el tipado de las propiedades, ademas de poder mejorar como se mostrará en la story
@@ -84,3 +89,5 @@ interface Props {
   size?: "h1" | "h2" | "h3" | "normal";
 }
 ```
+
+> tsc -p [ path ] le indicamos la configuracion que debe tomar al momento de hacer la transpilacion de codigo
