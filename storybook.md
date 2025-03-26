@@ -91,3 +91,4 @@ interface Props {
 ```
 
 > tsc -p [ path ] le indicamos la configuracion que debe tomar al momento de hacer la transpilacion de codigo
+> npm pack podemos ver que es lo que se subira mediante un zip
