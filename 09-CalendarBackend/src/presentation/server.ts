@@ -30,7 +30,7 @@ export class Server {
     this.app.use(express.static(this.public_path));
     this.app.use(
       cors({
-        origin: ["http://localhost:5173"],
+        origin: ["http://127.0.0.1:5173", "http://localhost:5173"],
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],

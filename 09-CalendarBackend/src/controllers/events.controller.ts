@@ -23,7 +23,7 @@ export class EventsController {
 
       const events = await this.eventDatasource.getEvents();
 
-      res.status(201).json({
+      res.status(200).json({
         ok: true,
         events,
       });
