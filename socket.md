@@ -90,3 +90,18 @@ io.on("connection", (client) => {
   });
 });
 ```
+
+`Evento: connect`
+
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+  console.log("✅ Cliente conectado al servidor");
+});
+```
+
+- El cliente detecta que se conectó exitosamente al servidor.
+- Este evento se dispara automáticamente cuando la conexión es exitosa.

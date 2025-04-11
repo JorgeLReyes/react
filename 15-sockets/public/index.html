@@ -52,6 +52,8 @@
         socket.emit("mensaje", data);
       });
 
+      socket.on("connect", () => console.log("conectado"));
+
       socket.on("mensaje", (data) => {
         console.log(data);
         misMensajes.innerHTML += `<li>${data.message}</li>`;

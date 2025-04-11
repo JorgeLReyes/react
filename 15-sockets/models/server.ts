@@ -3,6 +3,7 @@ import path from "path";
 import { createServer } from "http";
 import { Server as SocketServer } from "socket.io";
 import { Sockets } from "./sockets";
+import cors from "cors";
 
 interface Props {
   publicPath?: string;
@@ -27,6 +28,12 @@ export class Server {
   public middlewares() {
     this.app.use(express.static(this.publicPath));
     this.app.use(express.static(path.join(__dirname, "../public")));
+    this.app.use(
+      cors({
+        origin: ["http://localhost:3000"],
+        credentials: true,
+      })
+    );
   }
 
   public configSockets() {
