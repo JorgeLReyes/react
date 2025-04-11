@@ -15,48 +15,21 @@
   <body>
     <h1 class="mt-5">Minichat</h1>
     <hr />
-    <form id="form">
-      <div class="row">
-        <div class="col-8">
-          <input
-            type="text"
-            name="message"
-            id="message"
-            placeholder="Mensaje..."
-            class="form-control"
-          />
-        </div>
-        <div class="col-4">
-          <button class="btn btn-primary">Enviar</button>
-        </div>
-      </div>
-    </form>
 
     <div class="row">
       <div class="col">
-        <ul id="misMensajes"></ul>
+        <ul id="bandas"></ul>
       </div>
     </div>
     <script>
       // const socket = io("http://localhost:3000");
       const socket = io();
-      const form = document.querySelector("#form");
-      const misMensajes = document.querySelector("#misMensajes");
-      const message = document.querySelector("#message");
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        socket.emit("mensaje", data);
-      });
+      const bandas = document.querySelector("#bandas");
 
       socket.on("connect", () => console.log("conectado"));
 
-      socket.on("mensaje", (data) => {
-        console.log(data);
-        misMensajes.innerHTML += `<li>${data.message}</li>`;
+      socket.on("current-bands", (bands) => {
+        bands.forEach((band) => (bandas.innerHTML += `<li>${band.name}</li>`));
       });
     </script>
   </body>
