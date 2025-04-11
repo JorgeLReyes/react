@@ -1,0 +1,23 @@
+{
+  "name": "15-sockets",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsnd --respawn --clear ./app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "JorgeLReyes",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/typescript": "^0.4.29",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}

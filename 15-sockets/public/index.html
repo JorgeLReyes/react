@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+      crossorigin="anonymous"
+    />
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1 class="mt-5">Minichat</h1>
+    <hr />
+    <form id="form">
+      <div class="row">
+        <div class="col-8">
+          <input
+            type="text"
+            name="message"
+            id="message"
+            placeholder="Mensaje..."
+            class="form-control"
+          />
+        </div>
+        <div class="col-4">
+          <button class="btn btn-primary">Enviar</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="row">
+      <div class="col">
+        <ul id="misMensajes"></ul>
+      </div>
+    </div>
+    <script>
+      // const socket = io("http://localhost:3000");
+      const socket = io();
+      const form = document.querySelector("#form");
+      const misMensajes = document.querySelector("#misMensajes");
+      const message = document.querySelector("#message");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        socket.emit("mensaje", data);
+      });
+
+      socket.on("mensaje", (data) => {
+        console.log(data);
+        misMensajes.innerHTML += `<li>${data.message}</li>`;
+      });
+    </script>
+  </body>
+</html>
