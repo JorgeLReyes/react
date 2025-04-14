@@ -16,18 +16,15 @@ export class BandList {
     return this.bands;
   }
 
-  public increateVotes(id: string) {
-    const band = this.bands.find((band) => {
-      band.id === id;
-    });
+  public increaseVotes(id: string) {
+    const band = this.bands.find((band) => band.id === id);
     if (band) band.votes += 1;
     return this.bands;
   }
 
   public changeName(id: string, newName: string) {
-    const band = this.bands.find((band) => {
-      band.id === id;
-    });
+    const band = this.bands.find((band) => band.id === id);
+    console.log(band);
     if (band) band.name = newName;
     return this.bands;
   }

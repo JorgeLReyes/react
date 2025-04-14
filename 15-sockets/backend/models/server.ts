@@ -30,7 +30,7 @@ export class Server {
     this.app.use(express.static(path.join(__dirname, "../public")));
     this.app.use(
       cors({
-        origin: ["http://localhost:3000"],
+        origin: [process.env.DOMAIN!],
         credentials: true,
       })
     );

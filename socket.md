@@ -1,5 +1,7 @@
 # SOCKETS
 
+`npm i socket.io`
+
 Los web sockets mantienen la comunicacion full duplex (cliente-servidor)
 
 - Socket: identificador de la conexión de un cliente
@@ -105,3 +107,27 @@ socket.on("connect", () => {
 
 - El cliente detecta que se conectó exitosamente al servidor.
 - Este evento se dispara automáticamente cuando la conexión es exitosa.
+
+## Con REACT
+
+`npm i socket.io-client`
+
+```js
+import { io } from "socket.io-client";
+// También existe (más vieja, pero válida)
+// import { connect } from "socket.io-client";
+
+const socket = io("http://localhost:3000");
+
+io("http://localhost:3000", {
+  transports: ["websocket"],
+});
+```
+
+> Cuando usas transports: ['websocket'] en Socket.io, le estás indicando al cliente que solo intente usar WebSocket y que no intente otros métodos de transporte como el HTTP long-polling. Esto es útil cuando ya sabes que tu servidor solo manejará WebSocket, lo que puede hacer que la conexión sea más rápida, ya que el cliente no pierde tiempo intentando hacer un upgrade a WebSocket desde otro transporte. Sin embargo, si por alguna razón la red o el servidor no permiten WebSocket, la conexión fallará inmediatamente, sin intentar usar el método de polling como alternativa.
+>
+> Por defecto, Socket.io intentará el long-polling y luego hará un upgrade a WebSocket si es posible. Al forzar el uso de WebSocket, estás diciendo "no intentes otras opciones, solo usa WebSocket". Es útil cuando sabes que ambas partes (cliente y servidor) están configuradas para WebSocket y no quieres complicar la conexión
+
+### `socket.off` Limpiar los eventos
+
+La función .off() de socket.io-client es la forma de quitar o remover un listener que antes agregaste con .on().
