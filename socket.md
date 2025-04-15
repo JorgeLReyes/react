@@ -131,3 +131,35 @@ io("http://localhost:3000", {
 ### `socket.off` Limpiar los eventos
 
 La función .off() de socket.io-client es la forma de quitar o remover un listener que antes agregaste con .on().
+
+### solo tener un cliente
+
+`Resolverlo con useMemo`
+
+> Memoriza el resultado, por lo cual simepre devolvera el mismo socket
+
+```js
+const socket = useMemo(
+  () => io(serverPath, { transports: ["websocket"] }),
+  [serverPath]
+);
+```
+
+`Resolverlo con useState`
+
+> Solo ejecuta la funcion una vez y evalua solo el resultado, si no le pasamos una funcion el socket se creara por cada renderizacion
+
+```js
+const socket = useState(() => io(serverPath, { transports: ["websocket"] }));
+```
+
+`Resolverlo con useRef (preferentemente)`
+
+> No depende de renderizaciones, la actualizacion es manual, por lo cual el socket solo cambia y se crea de nuevo si lo hacemos explicitamente
+
+```js
+const socket = useRef < Socket > undefined;
+
+if (!socket.current)
+  socket.current = io(serverPath, { transports: ["websocket"] });
+```

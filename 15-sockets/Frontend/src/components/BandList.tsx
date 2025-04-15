@@ -1,13 +1,25 @@
-import { FocusEvent } from "react";
+import { FocusEvent, useContext, useEffect, useState } from "react";
 import { Band } from "../types";
+import { SocketContext } from "../context/SocketContext";
 
-interface Props {
-  bands: Band[];
-  vote: (id: string) => void;
-  deleteBand: (id: string) => void;
-  changeName: (data: { id: string; newName: string }) => void;
-}
-export const BandList = ({ bands, vote, deleteBand, changeName }: Props) => {
+export const BandList = () => {
+  const { socket } = useContext(SocketContext);
+  const [bands, setBands] = useState<Band[]>([]);
+
+  useEffect(() => {
+    socket.on("current-bands", (bands) => setBands(bands));
+    return () => {
+      socket.off("current-bands");
+    };
+  }, [socket]);
+
+  const vote = (id: string) => socket.emit("vote-band", id);
+
+  const deleteBand = (id: string) => socket.emit("delete-band", id);
+
+  const changeName = (data: { id: string; newName: string }) =>
+    socket.emit("change-band-name", data);
+
   const handleClick = (event: FocusEvent<HTMLInputElement>, id: string) =>
     changeName({ id, newName: event.currentTarget.value });
 

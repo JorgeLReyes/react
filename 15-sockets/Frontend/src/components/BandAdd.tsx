@@ -1,8 +1,11 @@
-interface Props {
-  createBand: (bandName: string) => void;
-}
+import { useContext } from "react";
+import { SocketContext } from "../context/SocketContext";
 
-export const BandAdd = ({ createBand }: Props) => {
+export const BandAdd = () => {
+  const { socket } = useContext(SocketContext);
+
+  const createBand = (name: string) => socket.emit("create-band", { name });
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const value = e.currentTarget["bandName"].value;
