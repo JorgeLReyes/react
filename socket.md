@@ -163,3 +163,29 @@ const socket = useRef < Socket > undefined;
 if (!socket.current)
   socket.current = io(serverPath, { transports: ["websocket"] });
 ```
+
+### Respuesta u oyente mediante callback del emit
+
+Podemos usar un callback en vez de un `socket.on` para permitir que el servidor sea el que nos de una respuesta mas directa, sin depender de listener por parte del cliente, sin embargo esto hara que la respuesta sea unicamente para el socket que emitio el evento
+
+🧠 ¿Qué implica esto?
+
+- ✅ Solo el socket que emitió el evento recibe la respuesta.
+- ✅ No necesitas tener un socket.on(...) para ese evento en el cliente.
+- 🚫 Otros clientes no se enteran de lo que pasó, a menos que tú lo emitas aparte.
+
+```js
+// Cliente
+socket.emit("request-ticket", null, (ticket: Ticket) =>
+  setTicket(ticket.number)
+);
+
+// Servidor
+socket.on("request-ticket", (data, callback) =>
+  callback(this.ticketList.createTicket())
+);
+```
+
+> Usar el callback es como una respuesta privada
+>
+> Usar socket.on es como una emisora de radio 📡

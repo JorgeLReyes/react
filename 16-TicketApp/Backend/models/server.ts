@@ -1,0 +1,51 @@
+import express from "express";
+import path from "path";
+import { createServer } from "http";
+import { Server as SocketServer } from "socket.io";
+import { Sockets } from "./sockets";
+import cors from "cors";
+import { TicketList } from "./ticket-list";
+
+interface Props {
+  publicPath?: string;
+  port?: number;
+}
+
+export class Server {
+  public readonly app = express();
+  public readonly publicPath: string;
+  public readonly port: number;
+  public readonly server = createServer(this.app);
+  public readonly io: SocketServer;
+  public readonly socketServer: Sockets;
+  // public readonly ticketList: any;
+
+  constructor({ publicPath = "public", port = 3000 }: Props) {
+    this.port = port;
+    this.publicPath = publicPath;
+    this.middlewares();
+    // this.ticketList = new TicketList();
+    this.io = new SocketServer(this.server);
+    this.socketServer = new Sockets(this.io);
+  }
+
+  public middlewares() {
+    this.app.use(express.static(this.publicPath));
+    this.app.use(express.static(path.join(__dirname, "../public")));
+    this.app.use(
+      cors({
+        origin: [process.env.DOMAIN!],
+        credentials: true,
+      })
+    );
+    this.app.get("/ultimos", (req, res) => {
+      res.status(200).json(this.socketServer.ticketList.lastThrityTeenTickets);
+    });
+  }
+
+  public start() {
+    this.server.listen(this.port, () =>
+      console.log("Server running on port", this.port)
+    );
+  }
+}

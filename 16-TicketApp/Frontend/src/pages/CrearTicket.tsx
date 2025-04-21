@@ -1,14 +1,21 @@
 import { DownloadOutlined } from "@ant-design/icons";
 import { Button, Col, Row, Typography } from "antd";
 import { useHideMain } from "../hooks/useHideMain";
+import { useContext, useState } from "react";
+import { SocketContext } from "../context/SocketContext";
+import { Ticket } from "../../../Backend/models/ticket";
 
 const { Title, Text } = Typography;
 export const CrearTicket = () => {
   useHideMain(true);
+  const { socket } = useContext(SocketContext);
+  const [ticket, setTicket] = useState(0);
 
-  const nuevoTicket = () => {
-    console.log("Nuevo ticket creado");
-  };
+  const nuevoTicket = () =>
+    socket.emit("request-ticket", null, (ticket: Ticket) =>
+      setTicket(ticket.number)
+    );
+
   return (
     <>
       <Row>
@@ -64,7 +71,7 @@ export const CrearTicket = () => {
               fontSize: 55,
             }}
           >
-            55
+            {ticket}
           </Text>
         </Col>
       </Row>
