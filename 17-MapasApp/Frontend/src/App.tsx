@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from "react";
+import { useMap } from "./hooks/useMap";
+
+const puntoInicial = {
+  lng: -74.5,
+  lat: 40,
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { coords, setRef, observableNewMarker$, observableMoveMarker$ } =
+    useMap({ puntoInicial });
+
+  useEffect(() => {
+    const subscribe = observableNewMarker$.subscribe((marker) => {
+      console.log("Marker", marker);
+    });
+
+    return () => {
+      subscribe.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const subscribe = observableMoveMarker$.subscribe((marker) => {
+      console.log("Marker", marker);
+    });
+    return () => {
+      subscribe.unsubscribe();
+    };
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1>Mapa</h1>
+      <div className="info">
+        Lng {coords.lng} | Lat {coords.lat}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div ref={setRef} className="mapContainer"></div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
