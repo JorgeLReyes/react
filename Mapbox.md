@@ -56,7 +56,11 @@ Creamos un marcador y usamos el metodo setLngLat para añadir el marcador y conc
 
 ```js
 const popup = new Popup().setHTML(`<p>En algun lugar del mundo</p>`);
-new Marker().setLngLat(map.getCenter()).setPopup(popup).addTo(map);
+new Marker()
+  .setLngLat(map.getCenter())
+  .setPopup(popup)
+  .addTo(map)
+  .setDraggable(true);
 ```
 
 ## FlyTo
