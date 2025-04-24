@@ -189,3 +189,11 @@ socket.on("request-ticket", (data, callback) =>
 > Usar el callback es como una respuesta privada
 >
 > Usar socket.on es como una emisora de radio 📡
+
+### Broadcast
+
+Solo emite la señal a los clientes excepto al del socket actual
+
+```js
+socket.broadcast.emit("event", data);
+```

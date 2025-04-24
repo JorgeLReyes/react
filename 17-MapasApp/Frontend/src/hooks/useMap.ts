@@ -10,6 +10,12 @@ interface Props {
   };
 }
 
+export interface NewMarker {
+  id?: string;
+  lng: number;
+  lat: number;
+}
+
 mapboxgl.accessToken =
   "pk.eyJ1Ijoiam9yZ2VscmV5ZXMiLCJhIjoiY204dDhxMG1uMDd5ajJscHk3dnZjODQ1dCJ9.S_B-OZKi1ZblOM-sqLUGgg";
 
@@ -27,20 +33,27 @@ export const useMap = ({ puntoInicial }: Props) => {
     mapDiv.current = node;
   }, []);
 
-  const addMarker = useCallback(({ lngLat: { lng, lat } }: MapMouseEvent) => {
+  const addMarker = useCallback((newMarker: NewMarker) => {
+    const { lng, lat, id } = newMarker;
     const marker = new Marker() as Marker & { id?: string };
-    const idMarker = uuid();
+    const idMarker = id || uuid();
     marker.id = idMarker;
 
     marker.setLngLat([lng, lat]).addTo(map.current!).setDraggable(true);
     markers.current.set(idMarker, marker);
-    observableNewMarker.current.next({ id: idMarker, lng, lat });
+    if (!id) observableNewMarker.current.next({ id: idMarker, lng, lat });
 
     marker.on("drag", ({ target }) => {
       const id = target.id;
       const { lng, lat } = target.getLngLat();
       observableMoveMarker.current.next({ id, lng, lat });
     });
+  }, []);
+
+  const updateMarker = useCallback((newMarker: NewMarker) => {
+    markers.current
+      .get(newMarker.id!)
+      ?.setLngLat([newMarker.lng, newMarker.lat]);
   }, []);
 
   useEffect(() => {
@@ -63,25 +76,30 @@ export const useMap = ({ puntoInicial }: Props) => {
   }, []);
 
   useEffect(() => {
-    map.current?.on("move", () => {
+    const handleMove = () => {
       const { lng, lat } = map.current!.getCenter();
       setCoords({
         lng: Number(lng.toFixed(4)),
         lat: Number(lat.toFixed(4)),
       });
-    });
+    };
+
+    map.current?.on("move", handleMove);
 
     return () => {
-      map.current?.off("move", () => {
-        console.log("move desmontado");
-      });
+      map.current?.off("move", handleMove);
     };
   }, []);
 
   useEffect(() => {
-    map.current?.on("click", addMarker);
+    const handleClick = (event: MapMouseEvent) => {
+      const { lng, lat } = event.lngLat;
+      addMarker({ lng, lat });
+    };
+
+    map.current?.on("click", handleClick);
     return () => {
-      map.current?.off("click", addMarker);
+      map.current?.off("click", handleClick);
     };
   }, []);
 
@@ -89,6 +107,7 @@ export const useMap = ({ puntoInicial }: Props) => {
     coords,
     setRef,
     addMarker,
+    updateMarker,
     observableNewMarker$: observableNewMarker.current,
     observableMoveMarker$: observableMoveMarker.current,
   };

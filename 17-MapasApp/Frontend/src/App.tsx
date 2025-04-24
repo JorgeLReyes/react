@@ -1,5 +1,7 @@
-import { useEffect } from "react";
 import { useMap } from "./hooks/useMap";
+import { useEvents } from "./hooks/useEvents";
+import { SocketContext } from "./context/SocketContext";
+import { useContext } from "react";
 
 const puntoInicial = {
   lng: -74.5,
@@ -7,27 +9,25 @@ const puntoInicial = {
 };
 
 function App() {
-  const { coords, setRef, observableNewMarker$, observableMoveMarker$ } =
-    useMap({ puntoInicial });
+  const {
+    coords,
+    setRef,
+    observableNewMarker$,
+    observableMoveMarker$,
+    addMarker,
+    updateMarker,
+  } = useMap({ puntoInicial });
 
-  useEffect(() => {
-    const subscribe = observableNewMarker$.subscribe((marker) => {
-      console.log("Marker", marker);
-    });
+  const { socket } = useContext(SocketContext);
 
-    return () => {
-      subscribe.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    const subscribe = observableMoveMarker$.subscribe((marker) => {
-      console.log("Marker", marker);
-    });
-    return () => {
-      subscribe.unsubscribe();
-    };
-  }, []);
+  // custom hook
+  useEvents({
+    observableNewMarker$,
+    observableMoveMarker$,
+    addMarker,
+    updateMarker,
+    socket,
+  });
 
   return (
     <>
