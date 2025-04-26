@@ -1,0 +1,13 @@
+services:
+  db:
+    container_name: chat
+    image: mongo:8.0.8
+    restart: always
+    ports:
+      - 27025:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    command: ['--auth']
+    volumes:
+      - ./mongo:/data/db
