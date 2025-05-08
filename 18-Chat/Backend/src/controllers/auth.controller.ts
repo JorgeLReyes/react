@@ -73,13 +73,22 @@ export class AuthController {
       res.status(400).json({ ok: false, msg: (<Error>error).message });
     }
   };
+
+  logout = async (req: Request, res: Response) => {
+    res.clearCookie("token").json({ ok: true });
+  };
+
   renew = async (req: Request, res: Response) => {
     try {
       const uid = req.body.user.uid;
-      const token = await JWTAdapter.getToken({ uid });
 
       const userExists = await this.userDatabase.findUserById(uid);
       if (!userExists) throw new Error("User not exists");
+
+      const { name, email, online } = userExists;
+
+      const token = await JWTAdapter.getToken({ uid, name, email, online });
+
       res
         .status(201)
         .cookie("token", token, {

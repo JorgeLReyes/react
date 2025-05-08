@@ -14,6 +14,7 @@ export class JWTMiddleware {
         ok: false,
         msg: "Token not found",
       });
+      return;
     }
 
     try {
@@ -28,10 +29,13 @@ export class JWTMiddleware {
       };
       next();
     } catch (e) {
-      res.status(401).json({
-        ok: false,
-        msg: (<Error>e).message,
-      });
+      res
+        .status(401)
+        .clearCookie("token")
+        .json({
+          ok: false,
+          msg: (<Error>e).message,
+        });
     }
   };
 }

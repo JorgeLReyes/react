@@ -18,4 +18,19 @@ export class UserDatabase {
   async createUser({ email, password, name }: UserProps) {
     return User.create({ email, password, name });
   }
+
+  async updateOnlineUser({ uid }: { uid: string }) {
+    return User.findByIdAndUpdate(uid, {
+      online: true,
+    });
+  }
+  async updateOfflineUser({ uid }: { uid: string }) {
+    return User.findByIdAndUpdate(uid, {
+      online: false,
+    });
+  }
+
+  async getUsers() {
+    return User.find().sort("-online");
+  }
 }

@@ -18,6 +18,8 @@ export class AuthRouter {
 
     router.post("/login", AuthMiddleware.validateLogin, controller.login);
 
+    router.post("/logout", JWTMiddleware.validateJWT, controller.logout);
+
     router.post("/renew", JWTMiddleware.validateJWT, controller.renew);
 
     return router;

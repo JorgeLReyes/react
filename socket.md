@@ -197,3 +197,97 @@ Solo emite la señal a los clientes excepto al del socket actual
 ```js
 socket.broadcast.emit("event", data);
 ```
+
+## Mas sobre la configuracion de io()
+
+1. autoConnect
+   - Es una opción de configuración en io() que determina si la conexión con el servidor se establece automáticamente al crear el socket.
+   - `autoConnect: true:` Conecta automáticamente al servidor al crear el socket. Este es el valor por defecto.
+   - `autoConnect: false:` El socket no se conecta automáticamente al servidor cuando lo creas. Tendrás que llamarlo explícitamente con socket.connect().
+
+```js
+io(serverPath, {
+  transports: ["websocket"],
+  autoConnect: true,
+  forceNew: true,
+});
+
+// Con autoconnect en false
+// socket.connect();
+```
+
+2. forceNew
+   - Es una opción que fuerza la creación de una nueva instancia del socket, incluso si ya existe una conexión activa.
+   - `forceNew: true` garantiza que se cree una nueva instancia de socket, incluso si hay una conexión activa.
+   - Esto evita que se reutilicen sockets antiguos, lo cual es útil cuando necesitas una nueva instancia o conexión limpia.
+
+```js
+io(serverPath, {
+  transports: ["websocket"],
+  autoConnect: true,
+  forceNew: true, // Crea una nueva instancia siempre
+});
+```
+
+3. query
+
+Se puede mandar cierta informacion a travez de esta propiedad
+
+```js
+io(serverPath, {
+  transports: ["websocket"],
+  autoConnect: true,
+  forceNew: true, // Crea una nueva instancia siempre,
+  query: {},
+});
+
+// backend
+socket.handshake.query;
+```
+
+## Cookies
+
+Se puden enviar y recibir cookies desde sockets. Cuando usamos el cliente de socket debemos pasarle en la configuracion la propiedad de credentials en true
+
+```js
+io(serverPath, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
+```
+
+En el servidor de sockets tenemos que configurar el CORS si no lo hemos configurado, pero si usamos un servidor http que ya lo tiene, entonces no será necesario, a menos que de algun error.
+
+Y unicamente accedemos a las cookies de la siguiente forma
+
+```js
+socket.handshake.headers.cookie;
+```
+
+Es importante saber que las cookies vienen en string y estan divididas por ";", por lo cual podemos usar el paquete de `cookie` para parsearlas y usarlas como objeto
+
+```js
+import * as cookie from "cookie";
+
+const cookies = cookie.parse(socket.handshake.headers.cookie!);
+console.log(cookies.token);
+```
+
+## Salas (ROOMS - Join)
+
+Las **rooms** son canales virtuales que permiten organizar sockets en grupos para emitir eventos dirigidos solo a un subconjunto de clientes conectados.
+
+```js
+// Unirse a una sala
+socket.join("nombre-sala");
+
+// Emitir un evento a una sala
+io.to("nombre-sala").emit("evento", data);
+
+// Salir de una sala (opcional)
+socket.leave("nombre-sala");
+```
+
+- Un socket puede estar en múltiples salas al mismo tiempo.
+- Cada socket se une automáticamente a una sala con su propio id.
+- Las salas se crean automáticamente al hacer join() y desaparecen si no hay sockets en ellas.
