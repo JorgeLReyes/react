@@ -779,3 +779,5 @@ En un <Form>, los nombres de los inputs (name="q") actúan directamente como los
 // Output
 // /ruta-actual?q=valor
 ```
+
+# Router v7
