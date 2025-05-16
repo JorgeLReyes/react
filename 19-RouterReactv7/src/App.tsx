@@ -1,15 +1,15 @@
-// import AuthLayout from "./auth/layout/AuthLayout";
-import ChatLayout from "./chat/layout/ChatLayout";
-import ChatPage from "./chat/pages/ChatPage";
+import { AppRouter } from "./AppRouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <>
-      {/* <AuthLayout /> */}
-      <ChatLayout>
-        <ChatPage />
-      </ChatLayout>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <AppRouter />
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 }
 

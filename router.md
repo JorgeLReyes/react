@@ -781,3 +781,51 @@ En un <Form>, los nombres de los inputs (name="q") actúan directamente como los
 ```
 
 # Router v7
+
+Todos los componentes y funciones se toman de react-router (no de react-router-dom)
+
+Versión mas actual:
+`npm i react-router`
+
+- `Routes`: Definición de las rutas
+- `Route`: La ruta
+- `Outlet`: Sirve para renderizar rutas hijas dentro de rutas padre
+
+## Formas de definir la ruta
+
+`Con path`:
+
+```js
+<Route element={<AuthLayout />} path="/ruta"></Route>
+```
+
+`Con index`:
+
+Cuando queremos que una ruta sea la principal ya sea del Router o de un padre, es decir, cuando ocurre anidación de rutas y deseamos que una de estas tambien haga match con la ruta padre, usaremos index, haciendola la ruta por defecto
+
+```js
+<Route element={<AuthLayout />} index></Route>
+```
+
+## Outlet
+
+Las rutas absolutas no son permitidas dentro de las rutas anidadas.
+
+- Se puede resolver anteponiendo la ruta padre
+
+```js
+import { Outlet } from "react-router";
+
+// ❌Esto esta mal
+<Route path="/auth" element={<AuthLayout />}>
+  <Route path="/login" element={<h1>Hi</h1>} />
+</Route>
+
+
+
+<Route path="/auth" element={<AuthLayout />}>
+  <Route path="/auth/login" element={<h1>Hi</h1>} />
+</Route>;
+```
+
+## React Router como framework
