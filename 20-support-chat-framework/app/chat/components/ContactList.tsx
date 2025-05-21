@@ -1,5 +1,5 @@
 import { LogOut } from "lucide-react";
-import { NavLink } from "react-router";
+import { Form, NavLink } from "react-router";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import type { Client } from "../interfaces/chat.interface";
@@ -19,9 +19,13 @@ export const ContactList = ({ clients }: Props) => {
               <NavLink
                 key={client.id}
                 to={`/chat/client/${client.id}`}
-                className={({ isActive }) =>
+                className={({ isActive, isPending }) =>
                   `w-full flex justify-start transition-all duration-300 pt-1 pb-1 rounded-md ${
-                    isActive ? "bg-primary/10" : "bg-muted/10 hover:bg-muted/20"
+                    isActive || isPending
+                      ? isPending
+                        ? "bg-primary/30"
+                        : "bg-primary/10"
+                      : "bg-muted/10 hover:bg-muted/20"
                   }`
                 }
               >
@@ -49,12 +53,12 @@ export const ContactList = ({ clients }: Props) => {
           </Button>
         </div>
       </div>
-      <div className="p-4">
+      <Form method="post" action="/auth/logout" className="p-4">
         <Button variant="outline" className="w-full bg-gray-950 text-white">
           <LogOut className="h-4 w-4" />
           Logout
         </Button>
-      </div>
+      </Form>
     </ScrollArea>
   );
 };

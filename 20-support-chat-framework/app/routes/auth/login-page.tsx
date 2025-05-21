@@ -3,18 +3,63 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import placeholder from "~/assets/images/placeholder.svg";
-import { Link, useNavigate } from "react-router";
+import { data, Form, Link, redirect, useNavigate } from "react-router";
+import { getSession, commitSession } from "~/sessions.server";
+import type { Route } from "./+types/login-page";
+import { loginUser } from "~/assets/fake-data";
 
-const LoginPage = () => {
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+
+  if (session.has("userId")) return redirect("/chat");
+
+  return data(
+    { error: session.get("error") },
+    { headers: { "Set-Cookie": await commitSession(session) } }
+  );
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+  const form = await request.formData();
+  const email = form.get("email");
+  const password = form.get("password");
+
+  if (email === "admin@admin.com") {
+    session.flash("error", "Invalid email/password");
+    // return redirect("/auth/login?error=Invalid email/password", {
+    //   headers: {
+    //     "Set-Cookie": await commitSession(session),
+    //   },
+    // });
+    return data(
+      { error: "Invalid email/password" },
+      { headers: { "Set-Cookie": await commitSession(session) } }
+    );
+  }
+
+  const user = await loginUser();
+  session.set("userId", user.id);
+  session.set("token", user.token);
+  session.set("name", user.name);
+
+  return redirect("/chat", {
+    headers: {
+      "Set-Cookie": await commitSession(session),
+    },
+  });
+}
+
+const LoginPage = ({ actionData, loaderData }: Route.ComponentProps) => {
   const navigate = useNavigate();
-
+  console.log(actionData);
   const handleAppleSignIn = () => navigate("/auth/testing");
 
   return (
     <div className="flex flex-col gap-6">
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <Form className="p-6 md:p-8" method="post">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -26,6 +71,7 @@ const LoginPage = () => {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -41,7 +87,10 @@ const LoginPage = () => {
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" name="password" required />
+              </div>
+              <div className="text-center text-sm text-red-500">
+                {actionData?.error}
               </div>
               <Button type="submit" className="w-full">
                 Login
@@ -94,7 +143,8 @@ const LoginPage = () => {
                 </Link>
               </div>
             </div>
-          </form>
+          </Form>
+
           <div className="relative hidden bg-muted md:block">
             <img
               src={placeholder}

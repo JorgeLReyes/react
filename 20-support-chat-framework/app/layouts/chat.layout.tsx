@@ -1,19 +1,25 @@
 import { X } from "lucide-react";
-import { Outlet } from "react-router";
+import { Link, Outlet, redirect } from "react-router";
 import { getClients } from "~/assets/fake-data";
 import { ContactInformationCard } from "~/chat/components/ContactInformationCard";
 import { ContactList } from "~/chat/components/ContactList";
 import { Button } from "~/components/ui/button";
 import type { Route } from "./+types/chat.layout";
+import { getSession } from "~/sessions.server";
 
-export async function loader() {
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+
+  if (!session.has("userId")) return redirect("/auth/login");
+  const { id } = params;
+
   const clients = await getClients();
-  console.log("client loader ready");
-  return { clients };
+  const client = clients.find((client) => client.id === params.id);
+  return { clients, name: session.get("name"), client, id };
 }
 
 const ChatLayout = ({ loaderData }: Route.ComponentProps) => {
-  const { clients } = loaderData;
+  const { clients, client } = loaderData;
 
   return (
     <div className="flex h-screen bg-background">
@@ -22,7 +28,9 @@ const ChatLayout = ({ loaderData }: Route.ComponentProps) => {
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-full bg-primary" />
-            <span className="font-semibold">NexTalk</span>
+            <Link to={"/chat"} className="font-semibold">
+              {loaderData.name}
+            </Link>
           </div>
         </div>
         <ContactList clients={clients} />
