@@ -17,8 +17,8 @@ const routes = [
 
 export const NavBar = () => {
   return (
-    <Navbar>
-      <NavbarBrand>
+    <Navbar className="p-2 flex justify-between">
+      <NavbarBrand className="text-white">
         <AcmeLogo />
         <p className="font-bold text-inherit">ACME</p>
       </NavbarBrand>
@@ -38,7 +38,17 @@ export const NavBar = () => {
 
       <NavbarContent justify="end">
         <NavbarItem>
-          <Button as={NavLink} color="primary" to="/new" variant="flat">
+          <Button
+            as={NavLink}
+            to="/new"
+            variant="flat"
+            style={{
+              color: "rgb(59, 130, 246)",
+              backgroundColor: "rgba(30, 20, 160,0.5)",
+              padding: ".5rem",
+              borderRadius: ".5rem",
+            }}
+          >
             Nuevo producto
           </Button>
         </NavbarItem>

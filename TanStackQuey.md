@@ -150,3 +150,76 @@ Retrona las mismas propiedades que tiene el useQuery. Pero recibe las siguientes
 - getNextPageParam: es una funcion que retorna la siguiente pagina si es que hay, recibe dos parametros:
   - lastPage: es la ultima data devuelta por queryfn
   - page: es un array de toda la data que se va acumulando
+
+```js
+ const issuesQuery = useInfiniteQuery({
+    queryKey: ["issues", "infinite", { state, selectedLabels }],
+    queryFn: ({ pageParam, queryKey }) => {
+      const { state, selectedLabels } = queryKey[2] as Props;
+      return getIssues(state, selectedLabels, pageParam);
+    },
+    staleTime: 1000 * 60,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.length > 0 ? pages.length + 1 : undefined,
+  });
+
+  issuesQuery.fetchNextPage()
+```
+
+## useMutation (Mutaciones)
+
+Mantiene muchas similitudes con useQuery
+
+- mutationFn: es la funcion que se llama cuando llamamos a la mutacion
+- onSuccess: es una fuucion que se ejeucta si la petición se realizó con exito. Recibe:
+  - data: la data que retorna el mutationFn
+  - variables: el objeto que le mandamos al mutationFn
+  - context: si el onMutate retorna algo, eso será el contexto
+- onSettle:
+- onMutate: recibe una funcion que recibe la data que se le manda al mutationFn
+
+```js
+const mutation = useMutation({
+  mutationFn: (newTodo) => {
+    return axios.post("/todos", newTodo);
+  },
+});
+
+mutation.mutete(newTodo);
+```
+
+- mutate: manda a llamar la funcion `mutationFn` de la mutacion y los argumentos que le pasamos a esta al momento de llamarla son los que recibirá la funcion en sí
+- isPending: es un valor booeano que indica si la petición esta en proceso o ya finalizó
+
+### Invalidar querys
+
+Invalidar una query (por ejemplo, con queryClient.invalidateQueries()) no elimina la data ni la invalida en el sentido de volverla null o borrarla.
+
+Lo que hace es:
+
+- Marcarla como "stale" (obsoleta).
+- Disparar automáticamente una nueva petición en segundo plano (refetch), si hay algún componente usándola o si configuras que siempre haga refetch al invalidar.
+
+```js
+queryClient.invalidateQueries({
+  queryKey: ["llave o query a invalidar "],
+});
+```
+
+`Obtener la data de una key`
+
+- Una forma es mediante `queryClient.getQueryData` al cual le pasamos la key de la query en donde esta almacenada la data
+
+```js
+queryClient.getQueryData<Product[]>([queryKey]);
+```
+
+- Pasandole como segundo argumento una funcion a la funcion de setQueryData, esa funcion pasa como argumento la data que se tiene almacenada en la query con la llave que le pasamos en el primer argumento
+
+```js
+queryClient.setQueryData<Product[]>(
+  ["products", { filterKey: data.category }],
+  (oldData) => [...(oldData || []), data]
+);
+```
