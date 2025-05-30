@@ -1,19 +1,42 @@
-import { IssueItem } from './IssueItem';
+import { Issues } from "../../helpers/getIssues";
+import { State } from "../views/ListView";
+import { IssueItem } from "./IssueItem";
 
-export const IssueList = () => {
+interface Props {
+  issues: Issues[];
+  state: State;
+  onStateChange: (state: State) => void;
+}
+
+export const IssueList = ({ issues, onStateChange, state }: Props) => {
   return (
     <>
       {/* Botones de All, Open, Closed */}
       <div className="flex gap-4">
-        <button className="btn active">All</button>
-        <button className="btn">Open</button>
-        <button className="btn">Closed</button>
+        <button
+          onClick={() => onStateChange("all")}
+          className={`btn ${state === "all" && "active"} `}
+        >
+          All
+        </button>
+        <button
+          onClick={() => onStateChange("open")}
+          className={`btn ${state === "open" && "active"} `}
+        >
+          Open
+        </button>
+        <button
+          onClick={() => onStateChange("closed")}
+          className={`btn ${state === "closed" && "active"} `}
+        >
+          Closed
+        </button>
       </div>
 
       {/* Lista de issues */}
       <div className="mt-4">
-        {[1, 2, 3].map((issue) => (
-          <IssueItem key={issue} />
+        {issues.map((issue) => (
+          <IssueItem key={issue.id} issue={issue} />
         ))}
       </div>
     </>

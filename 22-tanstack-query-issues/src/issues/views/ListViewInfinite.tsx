@@ -1,15 +1,15 @@
 import { IssueList } from "../components/IssueList";
 import { LabelPicker } from "../components/LabelPicker";
-import { useIssues } from "../hooks/useIssues";
 import LoadingSpiner from "../../shared/components/LoadingSpiner";
 import { useState } from "react";
+import { useIssuesInfinite } from "../hooks/useIssuesInfinite";
 
 export type State = "open" | "closed" | "all";
 
-export const ListView = () => {
+export const ListViewInfinite = () => {
   const [state, setState] = useState<State>("all");
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
-  const { issuesQuery, page, nextPage, previousPage } = useIssues({
+  const { issuesQuery } = useIssuesInfinite({
     state,
     selectedLabels,
   });
@@ -28,28 +28,24 @@ export const ListView = () => {
         {issuesQuery.isLoading ? (
           <LoadingSpiner />
         ) : (
-          <>
+          <div className="flex flex-col justify-center">
             <IssueList
-              issues={issuesQuery.data || []}
+              issues={issuesQuery.data?.pages.flat() || []}
               onStateChange={setState}
               state={state}
             />
-            <div className="flex justify-between items-center">
-              <button
-                onClick={previousPage}
-                className="p-2 bg-blue-500 rounded-md hover:bg-blue-700 transition-all"
-              >
-                Anteriores
-              </button>
-              <span>{page}</span>
-              <button
-                onClick={nextPage}
-                className="p-2 bg-blue-500 rounded-md hover:bg-blue-700 transition-all"
-              >
-                Siguientes
-              </button>
-            </div>
-          </>
+            <button
+              onClick={() => issuesQuery.fetchNextPage()}
+              disabled={issuesQuery.isFetchingNextPage}
+              className="p-2 bg-blue-500 rounded-md hover:bg-blue-700 transition-all disabled:bg-gray-500"
+            >
+              {issuesQuery.isFetchingNextPage ? (
+                <LoadingSpiner />
+              ) : (
+                "Cargar mas"
+              )}
+            </button>
+          </div>
         )}
       </div>
 

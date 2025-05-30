@@ -60,6 +60,9 @@ UseQuery se dispará cuando se monta el componente o se requiere volver a dispar
 - staleTime: sirve para que mantenga el valor en cache por el tiempo que le definamos (unicamente para la llve definida en ese query)
 - retry: recibe el numero de reintentos si falla de la petición hasta que retorne la data o haya un error, si es false, este comportamiento se desactiva
 - retryDelay: cuantos milisegundos habrá antes de un reintento
+- placeholderData: mientras la data esta cargando podemos pasarle información de relleno para que la muestre mientras carga la data
+- initialData: es la información que tendra esa query desde el inicio y que persistira por el tiempo dado en el staleTime
+- enabled: controla si se ejecuta la función `queryFn` para obtener datos. Cuando `enabled: false`, la query **no hace fetch**, pero la query sigue existiendo con su `queryKey`. `enabled` es útil para condicionar la ejecución, pero no para proteger el acceso a datos indefinidos en `queryKey` o en el `queryFn`.
 
 ```js
 const {} = useQuery({
@@ -67,8 +70,23 @@ const {} = useQuery({
   queryFn: getCripto,
   staleTime: 1000 * 5,
   retry: false,
+  enabled: true,
 });
 ```
+
+En TanStack Query, es recomendable usar queryKey como un array estructurado en lugar de una cadena concatenada.
+
+```js
+{
+  queryKey: ["issues", issueNumber];
+  // o si no importa el orden de las llaves
+  queryKey: ["issues", { issueNumber }];
+}
+```
+
+- Cache y refetch precisos: Cada combinación única se gestiona como una entrada distinta en la caché.
+- Invalidación flexible: Puedes invalidar todas las queries relacionadas con "issues" usando:
+- Si el orden en la queryKey no importa podemos mandar los items del array como un objeto
 
 `useQuery retorna el siguiente objeto`
 
@@ -94,3 +112,41 @@ const queryClient = new QueryClient({
   },
 });
 ```
+
+## useQueryClient
+
+Es un hook que lo que hace es buscar el cliente que definimos al inicio de la aplicación y
+
+`prefetchQuery`funciona muy similar a useQuery pero esta funcion la ejecutamos de forma manual, pero esta funcion no retorna nada (void)
+
+```js
+queryClient.prefetchQuery({
+  queryKey: ["issues", issue.number],
+  queryFn: () => getIssue(issue.number),
+  staleTime: 1000 * 60,
+});
+```
+
+`setQueryData` establece data directamente en una key que nosotros definamos
+
+```js
+queryClient.setQueryData(["issues", issue.number], data, {
+  updateAt: Date.now() + 1000 * 60,
+});
+```
+
+- updateAt: recibe una fecha en la cual la información se mantendra "fresca"
+
+## useInfiniteQuery
+
+Retrona las mismas propiedades que tiene el useQuery. Pero recibe las siguientes propiedades
+
+- queryKey: es el arreglo de llaves, esta propiedad se usa como anteriormente se ha explicado
+- queryFn: es la funcion que se dispara al llamar al query sin embargo recibe dos parametros
+  - pageParam
+  - queryKey: es el querykey que pasamos como valor
+- staleTime: el tiempo en que se manendra fresca la información
+- initialPageParam: la pagina en la que iniciará la petición
+- getNextPageParam: es una funcion que retorna la siguiente pagina si es que hay, recibe dos parametros:
+  - lastPage: es la ultima data devuelta por queryfn
+  - page: es un array de toda la data que se va acumulando
