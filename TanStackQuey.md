@@ -177,7 +177,11 @@ Mantiene muchas similitudes con useQuery
   - variables: el objeto que le mandamos al mutationFn
   - context: si el onMutate retorna algo, eso será el contexto
 - onSettle:
-- onMutate: recibe una funcion que recibe la data que se le manda al mutationFn
+- onMutate: recibe una funcion que recibe la data que se le manda al mutationFn y se ejeucta antes del mutationFn y lo que retorne lo recibe onSuccess, onError y onSettled como context.
+- onSuccess: recibe una funcion que recibe:
+  - data: la data retornada del mutationFn
+  - variables: la data que le mandamos al momento de llamar al mutationFn
+  - context: la data retornada del onMutate
 
 ```js
 const mutation = useMutation({
@@ -222,4 +226,36 @@ queryClient.setQueryData<Product[]>(
   ["products", { filterKey: data.category }],
   (oldData) => [...(oldData || []), data]
 );
+```
+
+Cuando hacemos un mutation, la data asociada a una query no va a cambiar, por lo cual podemos aplicar disintas formas para actalizarla
+
+`InvalidateQueries`
+
+Cuando definimos un useMutation, entre las propiedades que podemos usar está onSuccess, esta propiedad es una funcion que se activará cuando la petición de la mutación haya salido correcta. Por lo cual, aqui podemos invalidar las queries, al hacerlo lo que hará es que la queryFn de la query que invalidemos se volverá a disparar y tendremos la data actualizada.
+
+```js
+onSuccess: (data, variables, context) => {
+  queryClient.invalidateQueries({
+    queryKey: ["products", { filterKey: data.category }],
+  });
+};
+```
+
+Otra forma que podemos usar es el setQueryData, esta funcion recibe la queryKey y la data o una funcion que recibe la data del cache actual, lo cual nos permitirá manejar esa data y añadir la nueva data a esta para obtener una data más actualizada
+
+```js
+// data es proporcionada por onSuccess
+queryClient.setQueryData([key], (oldData) => {
+  if (!oldData) return [data];
+  return [...oldData, data];
+});
+```
+
+Como nota, si queremos remover alguna query del cache lo hacemos con removeQueries
+
+```js
+queryClient.removeQueries({
+  queryKey: [key],
+});
 ```
